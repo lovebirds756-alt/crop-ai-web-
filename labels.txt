@@ -1,0 +1,6 @@
+0 Health
+1 Diseased
+2 Nitrogen_Deficiency
+3 Phosphorus_Deficiency
+4 Potassium_Deficiency
+5 Iron_Deficiency
