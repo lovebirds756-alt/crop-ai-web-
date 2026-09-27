@@ -3,19 +3,19 @@ import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
 
-st.set_page_config(page_title="SCERT AI Crop Health Scanner", page_icon="🌿")
+st.set_page_config(page_title="SCERT AI Crop Health Scanner", page_icon="🌿", layout="centered")
 
-st.title("🌿 SCERT AI Crop Disease & Deficiency Scanner")
-st.write("Upload or take a photo of a leaf sample to get an instant diagnosis and organic remedy.")
+st.title("🌿 SCERT AI Plant Health Scanner")
+st.write("Take or upload a photo of a leaf sample for instant AI analysis & organic remedies.")
 
 @st.cache_resource
-def load_model():
+def load_interpreter():
     interpreter = tf.lite.Interpreter(model_path="model.tflite")
     interpreter.allocate_tensors()
     return interpreter
 
 try:
-    interpreter = load_model()
+    interpreter = load_interpreter()
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
@@ -31,18 +31,21 @@ try:
         "Iron_Deficiency": "Iron Shortage! Apply iron chelate (Fe-EDTA) spray."
     }
 
-    img_file = st.camera_input("Take a picture of the leaf") or st.file_uploader("Or upload a leaf image...", type=["jpg", "png", "jpeg"])
+    img_file = st.camera_input("Take a photo using phone camera") 
+    if not img_file:
+        img_file = st.file_uploader("Or upload an image file...", type=["jpg", "png", "jpeg"])
 
     if img_file is not None:
         image = Image.open(img_file).convert('RGB')
-        st.image(image, caption='Uploaded Sample', use_column_width=True)
+        st.image(image, caption='Captured Sample', use_container_width=True)
         
-        # Preprocess
-        img = ImageOps.fit(image, (224, 224), Image.Resampling.LANCZOS)
-        img_array = np.asarray(img).astype(np.float32) / 255.0
+        # Preprocessing matching model input size
+        size = (224, 224)
+        image_resample = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+        img_array = np.asarray(image_resample).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
-st.image(image, caption='Captured Sample', use_container_width=True)
-        # Predict
+
+        # Inference
         interpreter.set_tensor(input_details[0]['index'], img_array)
         interpreter.invoke()
         output_data = interpreter.get_tensor(output_details[0]['index'])
@@ -51,10 +54,12 @@ st.image(image, caption='Captured Sample', use_container_width=True)
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        remedy = REMEDIES.get(raw_label, "Check soil and water parameters.")
+        remedy = REMEDIES.get(raw_label, "Check soil moisture and nutrient parameters.")
 
-        st.success(f"**Diagnosis:** {raw_label} ({confidence:.1f}% confidence)")
-        st.info(f"**Organic Remedy:** {remedy}")
+        st.markdown("---")
+        st.subheader(f"Diagnosis: :green[{raw_label}] ({confidence:.1f}% Match)")
+        st.info(f"**Recommended Remedy:** {remedy}")
 
 except Exception as e:
-    st.error(f"Error loading model: {e}")
+    st.error(f"App initialization error: {e}")
+    st.warning("Ensure 'model.tflite' and 'labels.txt' are in the root directory of your GitHub repository.")
