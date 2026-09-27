@@ -41,7 +41,7 @@ try:
         img = ImageOps.fit(image, (224, 224), Image.Resampling.LANCZOS)
         img_array = np.asarray(img).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
-
+st.image(image, caption='Captured Sample', use_container_width=True)
         # Predict
         interpreter.set_tensor(input_details[0]['index'], img_array)
         interpreter.invoke()
