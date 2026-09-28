@@ -2,14 +2,15 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
+import re
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for Animations, Cute Styling & Floating Leaves
+# Custom CSS for Cute Animations, Styling & Floating Elements
 st.markdown("""
 <style>
-    /* Cute Gradient Background */
+    /* Cute Dark Gradient Background */
     .stApp {
         background: linear-gradient(135deg, #0d1f2d 0%, #1d3557 50%, #112a46 100%);
         color: #f1faee;
@@ -18,34 +19,33 @@ st.markdown("""
     /* Keyframe Animations */
     @keyframes floatLeaf {
         0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-12px) rotate(8deg); }
+        50% { transform: translateY(-10px) rotate(6deg); }
         100% { transform: translateY(0px) rotate(0deg); }
     }
 
     @keyframes popIn {
-        0% { transform: scale(0.85); opacity: 0; }
+        0% { transform: scale(0.88); opacity: 0; }
         100% { transform: scale(1); opacity: 1; }
     }
 
     @keyframes pulseGlow {
         0% { box-shadow: 0 0 15px rgba(168, 255, 120, 0.2); }
-        50% { box-shadow: 0 0 30px rgba(168, 255, 120, 0.5); }
+        50% { box-shadow: 0 0 28px rgba(168, 255, 120, 0.45); }
         100% { box-shadow: 0 0 15px rgba(168, 255, 120, 0.2); }
     }
 
-    /* Floating Bouncing Leaf Logo */
+    /* Floating Bouncing Leaf Header Logo */
     .cute-logo {
-        font-size: 3.8rem;
+        font-size: 3.5rem;
         text-align: center;
-        display: inline-block;
-        width: 100%;
+        display: block;
         animation: floatLeaf 3s ease-in-out infinite;
         margin-top: 10px;
     }
 
-    /* Header Styling */
+    /* Title Styling */
     .title-text {
-        font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka', sans-serif;
+        font-family: 'Comic Sans MS', 'Fredoka', sans-serif;
         font-size: 2.5rem;
         font-weight: 900;
         background: linear-gradient(120deg, #a8ff78, #78ffd6);
@@ -58,20 +58,20 @@ st.markdown("""
     .subtitle-text {
         text-align: center;
         color: #a8dadc;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 500;
         margin-bottom: 1.8rem;
     }
 
     /* Result Container with Animated Pop-in & Leaf Pattern */
     .result-card {
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, pulseGlow 4s infinite;
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, pulseGlow 4s infinite;
         background: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border: 2px solid rgba(168, 255, 120, 0.3);
+        border: 2px solid rgba(168, 255, 120, 0.35);
         border-radius: 25px;
-        padding: 30px;
+        padding: 28px;
         margin-top: 20px;
         
         /* Cute Repeating Leaf Doodle Pattern Background */
@@ -79,11 +79,10 @@ st.markdown("""
         background-repeat: repeat;
     }
 
-    /* Cute Info Headers & Sections */
+    /* Info Headers & Rounded Body Text */
     .info-header {
         color: #a8ff78;
-        font-family: 'Fredoka', sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 700;
         margin-top: 14px;
         margin-bottom: 4px;
@@ -94,8 +93,8 @@ st.markdown("""
 
     .info-body {
         color: #f1faee;
-        font-size: 1.05rem;
-        background: rgba(0, 0, 0, 0.25);
+        font-size: 1.02rem;
+        background: rgba(0, 0, 0, 0.28);
         padding: 10px 16px;
         border-radius: 14px;
         margin-bottom: 12px;
@@ -129,7 +128,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Cute Floating Title Header
+# Header Section
 st.markdown('<div class="cute-logo">🍃🌱🔬</div>', unsafe_allow_html=True)
 st.markdown('<div class="title-text">Cellular Vision</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle-text">✨ AI Botanical Explorer & Plant Care Companion ✨</div>', unsafe_allow_html=True)
@@ -140,6 +139,44 @@ def load_interpreter():
     interpreter.allocate_tensors()
     return interpreter
 
+def parse_label(raw_label):
+    """
+    Intelligently extracts (plant_name, disease_status) regardless of how raw_label is formatted.
+    Handles 'Apple___healthy', 'Apple___Black_rot', 'Healthy_Tomato', '0 Rice___Bacterial_blight', etc.
+    """
+    # Remove leading numbers/spaces if present (e.g. "0 Apple___healthy")
+    cleaned = re.sub(r'^\d+\s*', '', raw_label).strip()
+
+    # Split by common delimiters like triple/double underscores or dashes
+    if "___" in cleaned:
+        parts = cleaned.split("___")
+    elif "__" in cleaned:
+        parts = cleaned.split("__")
+    elif " - " in cleaned:
+        parts = cleaned.split(" - ")
+    else:
+        parts = [cleaned]
+
+    if len(parts) >= 2:
+        plant = parts[0].replace("_", " ").title()
+        status = parts[1].replace("_", " ").title()
+    else:
+        # Single-word label or reversed label like "Healthy_Tomato"
+        val = parts[0].replace("_", " ")
+        if "healthy" in val.lower():
+            # Extract plant name if label is "Healthy Tomato" or "Tomato Healthy"
+            plant_cleaned = re.sub(r'(?i)\bhealthy\b', '', val).strip()
+            plant = plant_cleaned.title() if plant_cleaned else "Crop Sample"
+            status = "Healthy Leaf"
+        else:
+            plant = val.title()
+            status = "Condition Detected"
+
+    if "healthy" in status.lower():
+        status = "Super Healthy Leaf! ✨"
+
+    return plant, status
+
 try:
     interpreter = load_interpreter()
     input_details = interpreter.get_input_details()
@@ -148,76 +185,77 @@ try:
     with open("labels.txt", "r") as f:
         labels = [line.strip().split(' ', 1)[-1] for line in f.readlines()]
 
+    # Detailed Botanical & Care Info Dictionary
     PLANT_DATABASE = {
         "Apple___Apple_scab": {
             "plant_name": "Apple Tree (*Malus domestica*) 🍎",
-            "region": "Central Asian Mountains (Tian Shan), cultivated worldwide in cool zones.",
-            "conditions": "Full sunshine (6+ hrs/day), rich soil with good drainage, temperate climate.",
+            "region": "Central Asian Mountains (Tian Shan), grown in cool temperate zones globally.",
+            "conditions": "Full sunshine (6+ hrs/day), rich loamy soil, cold winter chilling.",
             "status": "Infected with Apple Scab 🍂",
-            "remedy": "Spray organic copper or sulfur fungicide. Clear fallen autumn leaves to keep roots clean!"
+            "remedy": "Apply organic copper or sulfur fungicide spray. Rake up fallen leaves to keep soil clean."
         },
         "Apple___Black_rot": {
             "plant_name": "Apple Tree (*Malus domestica*) 🍎",
-            "region": "Central Asia, grown across Europe, Asia & North America.",
-            "conditions": "Cool to moderate climates, organic rich loamy soil.",
+            "region": "Central Asia, cultivated across Europe, Asia, and North America.",
+            "conditions": "Cool to moderate climate, fertile well-drained soil.",
             "status": "Infected with Black Rot 🥀",
-            "remedy": "Prune away infected twigs in winter and remove old dried fruit from branches."
+            "remedy": "Prune away dead or infected branches during dormant season and destroy mummified fruits."
         },
         "Apple___healthy": {
             "plant_name": "Apple Tree (*Malus domestica*) 🍎",
             "region": "Central Asian Mountains, cultivated globally.",
-            "conditions": "Full sun exposure, deep moist soil, seasonal winter cooling.",
+            "conditions": "Full sunlight, deep fertile soil, consistent watering.",
             "status": "Super Healthy Leaf! ✨",
-            "remedy": "Your apple plant is thriving! Keep watering regularly and give it lots of sunshine."
+            "remedy": "Your apple tree is thriving! Maintain regular watering and annual winter pruning."
         },
         "Corn_(maize)___Common_rust_": {
             "plant_name": "Corn / Maize (*Zea mays*) 🌽",
-            "region": "Mesoamerica (Southern Mexico), grown globally in sunny farm fields.",
-            "conditions": "Warm weather (20°C–32°C), lots of sunlight, rich nitrogen soil.",
+            "region": "Mesoamerica (Southern Mexico), grown in sunny warm climates worldwide.",
+            "conditions": "Warm soil (20°C–32°C), high sunlight, rich nitrogen-fertilized ground.",
             "status": "Infected with Common Rust 🌽🍂",
-            "remedy": "Ensure proper field spacing for air circulation. Spray sulfur-based organic treatment."
+            "remedy": "Ensure proper row spacing for airflow. Apply neem oil or sulfur-based spray if severe."
         },
         "Corn_(maize)___healthy": {
             "plant_name": "Corn / Maize (*Zea mays*) 🌽",
-            "region": "Mesoamerica (Mexico), grown in warm belts worldwide.",
-            "conditions": "Warm temperature, high humidity, full direct sunlight.",
+            "region": "Mesoamerica (Mexico), grown in agricultural belts worldwide.",
+            "conditions": "Warm weather, full sun, deep organic soil with steady moisture.",
             "status": "Super Healthy Leaf! ✨",
-            "remedy": "Looking great! Keep providing balanced nitrogen nutrients during active growth."
+            "remedy": "Looking great! Keep providing balanced nitrogen nutrients during key growth phases."
         },
         "Potato___Early_blight": {
             "plant_name": "Potato Plant (*Solanum tuberosum*) 🥔",
-            "region": "South American Andes Mountains (Peru & Bolivia).",
-            "conditions": "Cool temperate climates, loose sandy-loam soil (pH 5.0–6.0).",
+            "region": "South American Andes (Peru & Bolivia).",
+            "conditions": "Cool climates (15°C–20°C), loose acidic soil (pH 5.0–6.0).",
             "status": "Infected with Early Blight 🥔🍂",
-            "remedy": "Spray neem oil or bio-fungicide. Avoid over-watering the leaves directly."
+            "remedy": "Spray bio-fungicide or copper spray. Avoid splashing water onto foliage during irrigation."
         },
         "Potato___Late_blight": {
             "plant_name": "Potato Plant (*Solanum tuberosum*) 🥔",
-            "region": "South American Andes, grown in cool regions around the globe.",
-            "conditions": "Cool moist weather, high humidity, light organic soil.",
+            "region": "South American Andes, cultivated in cool moist zones globally.",
+            "conditions": "Cool weather, high humidity (>90%), light well-drained soil.",
             "status": "Infected with Late Blight 🚨",
-            "remedy": "Remove affected leaves immediately to protect neighboring plants. Keep soil dry on top."
+            "remedy": "Remove infected leaves immediately to stop spreading. Keep soil surface dry."
         },
         "Potato___healthy": {
             "plant_name": "Potato Plant (*Solanum tuberosum*) 🥔",
             "region": "South American Andes Mountains.",
-            "conditions": "Cool weather, well-draining soil, moderate watering.",
+            "conditions": "Cool weather, light sandy-loam soil, moderate moisture.",
             "status": "Super Healthy Leaf! ✨",
-            "remedy": "Healthy plant! Pile extra soil around the lower stem to help bigger potatoes grow."
+            "remedy": "Healthy plant! Pile extra soil around stem bases to protect developing tubers."
         },
         "Tomato___Bacterial_spot": {
             "plant_name": "Tomato Plant (*Solanum lycopersicum*) 🍅",
             "region": "Western South America (Andean region).",
-            "conditions": "Warm sunshine, rich sandy soil, gentle watering at root level.",
+            "conditions": "Full sun, warm temperature (21°C–29°C), rich sandy-loam soil.",
             "status": "Infected with Bacterial Spot 🍅🦠",
-            "remedy": "Apply organic copper spray. Water only at the base/roots to keep leaves completely dry."
+            "remedy": "Apply copper-based fungicide spray. Water at root level only to keep leaves dry."
         },
         "Tomato___healthy": {
             "plant_name": "Tomato Plant (*Solanum lycopersicum*) 🍅",
-            "region": "South American Andes, cultivated worldwide.",
-            "conditions": "6-8 hours of direct sunlight, warm temperature, calcium-rich soil.",
+            "region": "South American Andes, grown in home gardens and farms globally.",
+            "conditions": "6-8 hours direct sunshine, warm soil, calcium-rich fertilizer.",
             "status": "Super Healthy Leaf! ✨",
-            "remedy": "Plant is super happy! Maintain steady watering to encourage juicy sweet tomatoes."
+            "remedy": "Plant is super happy! Keep soil evenly moist to encourage sweet, healthy tomatoes."
         }
     }
 
@@ -242,23 +280,22 @@ try:
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        # Smart fallback parsing so raw text never displays as "Health"
-        clean_parts = raw_label.replace("___", " - ").replace("_", " ").split(" - ")
-        parsed_plant = clean_parts[0] if len(clean_parts) > 0 else "Unknown Crop"
-        parsed_status = clean_parts[1] if len(clean_parts) > 1 else "Analyzed"
+        # Run smart parser on predicted label
+        parsed_plant, parsed_status = parse_label(raw_label)
 
+        # Retrieve exact details from PLANT_DATABASE or use parsed fallback
         info = PLANT_DATABASE.get(raw_label, {
-            "plant_name": f"{parsed_plant} 🌿",
+            "plant_name": f"{parsed_plant} Plant 🌿",
             "region": "Subtropical & Temperate Agricultural Zones.",
-            "conditions": "Full sun exposure, well-draining soil, moderate watering.",
+            "conditions": "Full sun exposure, well-draining organic soil, moderate watering.",
             "status": parsed_status,
-            "remedy": "Inspect plant for signs of stress, maintain moisture levels, and balance soil nutrients."
+            "remedy": "Inspect plant for stress signs, maintain consistent soil moisture, and balance organic nutrients."
         })
 
-        is_healthy = "healthy" in raw_label.lower()
+        is_healthy = "healthy" in raw_label.lower() or "healthy" in parsed_status.lower()
         badge_class = "status-badge-healthy" if is_healthy else "status-badge-diseased"
 
-        # Cute Glassmorphism Result Card with Animated Pop-in
+        # Glassmorphism Animated Result Card
         st.markdown(f"""
         <div class="result-card">
             <div class="{badge_class}">
