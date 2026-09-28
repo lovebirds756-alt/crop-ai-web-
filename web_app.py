@@ -2,12 +2,11 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
-import streamlit.components.v1 as components
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for App Styling
+# Custom CSS for App Styling & Plant Emoji Burst Firework
 st.markdown("""
 <style>
     /* Gradient App Background */
@@ -23,7 +22,7 @@ st.markdown("""
         100% { transform: translateY(0px) rotate(0deg); }
     }
 
-    /* Floating Bouncing Leaf Header Logo */
+    /* Header Logo */
     .cute-logo {
         font-size: 3.5rem;
         text-align: center;
@@ -51,38 +50,49 @@ st.markdown("""
         font-weight: 500;
         margin-bottom: 1.8rem;
     }
+
+    /* Pure CSS Plant Firework Burst Animation */
+    @keyframes shootUpLeft {
+        0% { transform: translate(0, 50px) scale(0.2) rotate(0deg); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translate(-120px, -180px) scale(1.6) rotate(-45deg); opacity: 0; }
+    }
+
+    @keyframes shootUpRight {
+        0% { transform: translate(0, 50px) scale(0.2) rotate(0deg); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translate(120px, -180px) scale(1.6) rotate(45deg); opacity: 0; }
+    }
+
+    @keyframes shootStraight {
+        0% { transform: translate(0, 50px) scale(0.2) rotate(0deg); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translate(0px, -220px) scale(1.8) rotate(15deg); opacity: 0; }
+    }
+
+    /* Firework Container */
+    .firework-box {
+        position: relative;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .particle {
+        position: absolute;
+        font-size: 2.5rem;
+        opacity: 0;
+    }
+
+    .p1 { animation: shootUpLeft 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    .p2 { animation: shootStraight 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards; }
+    .p3 { animation: shootUpRight 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards; }
+    .p4 { animation: shootUpLeft 1.3s cubic-bezier(0.25, 1, 0.5, 1) 0.3s forwards; }
+    .p5 { animation: shootUpRight 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.15s forwards; }
 </style>
 """, unsafe_allow_html=True)
-
-# Function to trigger plant emoji confetti burst
-def trigger_emoji_firework():
-    js_code = """
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script>
-        const plantEmojis = ['🍃', '✨', '🌱', '🌾', '🌿'];
-        
-        function fireEmojiBurst() {
-            if (window.confetti) {
-                const scalar = 3;
-                const leafShape = plantEmojis.map(emoji => confetti.shapeFromText({ text: emoji, scalar }));
-                
-                // Firework burst shooting up from center-bottom
-                window.parent.confetti({
-                    shapes: leafShape,
-                    scalar: scalar,
-                    particleCount: 45,
-                    spread: 80,
-                    startVelocity: 45,
-                    origin: { y: 0.8 },
-                    ticks: 300
-                });
-            }
-        }
-        
-        setTimeout(fireEmojiBurst, 300);
-    </script>
-    """
-    components.html(js_code, height=0)
 
 # Header Section
 st.markdown('<div class="cute-logo">🍃🌱🔬</div>', unsafe_allow_html=True)
@@ -171,9 +181,6 @@ try:
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        # Trigger custom emoji firework burst (🍃, ✨, 🌱, 🌾, 🌿)
-        trigger_emoji_firework()
-
         # Retrieve entry from PLANT_DATABASE
         info = PLANT_DATABASE.get(raw_label, {
             "title": raw_label.replace("_", " "),
@@ -184,6 +191,17 @@ try:
         })
 
         st.markdown("---")
+
+        # Plant Firework Burst HTML
+        st.markdown("""
+        <div class="firework-box">
+            <span class="particle p1">🍃</span>
+            <span class="particle p2">✨</span>
+            <span class="particle p3">🌱</span>
+            <span class="particle p4">🌾</span>
+            <span class="particle p5">🌿</span>
+        </div>
+        """, unsafe_allow_html=True)
 
         # Status Callout
         if "Health" in raw_label:
