@@ -1,12 +1,12 @@
 import streamlit as st
-import tensorflow as tf
+import tensorflow astf
 from PIL import Image, ImageOps
 import numpy as np
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for App Styling & Plant Emoji Burst Firework
+# Custom CSS for App Styling & High-Visibility Plant Firework
 st.markdown("""
 <style>
     /* Gradient App Background */
@@ -51,46 +51,14 @@ st.markdown("""
         margin-bottom: 1.8rem;
     }
 
-    /* Pure CSS Plant Firework Burst Animation */
-    @keyframes shootUpLeft {
-        0% { transform: translate(0, 50px) scale(0.2) rotate(0deg); opacity: 0; }
-        50% { opacity: 1; }
-        100% { transform: translate(-120px, -180px) scale(1.6) rotate(-45deg); opacity: 0; }
-    }
-
-    @keyframes shootUpRight {
-        0% { transform: translate(0, 50px) scale(0.2) rotate(0deg); opacity: 0; }
-        50% { opacity: 1; }
-        100% { transform: translate(120px, -180px) scale(1.6) rotate(45deg); opacity: 0; }
-    }
-
-    @keyframes shootStraight {
-        0% { transform: translate(0, 50px) scale(0.2) rotate(0deg); opacity: 0; }
-        50% { opacity: 1; }
-        100% { transform: translate(0px, -220px) scale(1.8) rotate(15deg); opacity: 0; }
-    }
-
-    /* Firework Container */
-    .firework-box {
+    /* Firework Canvas Container */
+    .firework-canvas-container {
+        width: 100%;
+        height: 250px;
         position: relative;
-        height: 60px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 20px 0;
+        overflow: hidden;
+        margin-bottom: -40px;
     }
-
-    .particle {
-        position: absolute;
-        font-size: 2.5rem;
-        opacity: 0;
-    }
-
-    .p1 { animation: shootUpLeft 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-    .p2 { animation: shootStraight 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards; }
-    .p3 { animation: shootUpRight 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards; }
-    .p4 { animation: shootUpLeft 1.3s cubic-bezier(0.25, 1, 0.5, 1) 0.3s forwards; }
-    .p5 { animation: shootUpRight 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.15s forwards; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -192,16 +160,72 @@ try:
 
         st.markdown("---")
 
-        # Plant Firework Burst HTML
-        st.markdown("""
-        <div class="firework-box">
-            <span class="particle p1">🍃</span>
-            <span class="particle p2">✨</span>
-            <span class="particle p3">🌱</span>
-            <span class="particle p4">🌾</span>
-            <span class="particle p5">🌿</span>
+        # HTML5 Canvas Animation Shooting Plant Emojis UP like Fireworks
+        firework_html = """
+        <div class="firework-canvas-container">
+            <canvas id="emojiCanvas"></canvas>
         </div>
-        """, unsafe_allow_html=True)
+        <script>
+            (function() {
+                const canvas = document.getElementById('emojiCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = 250;
+                
+                const emojis = ['🍃', '✨', '🌱', '🌾', '🌿'];
+                const particles = [];
+                
+                // Spawn 25 emoji particles with upward firework trajectory
+                for (let i = 0; i < 25; i++) {
+                    particles.push({
+                        x: canvas.width / 2 + (Math.random() * 60 - 30),
+                        y: canvas.height - 10,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: -(Math.random() * 8 + 8), // High upward velocity
+                        size: Math.random() * 16 + 24, // Large visible font size
+                        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                        alpha: 1,
+                        rotation: Math.random() * Math.PI * 2,
+                        vRot: (Math.random() - 0.5) * 0.1
+                    });
+                }
+                
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    let active = false;
+                    particles.forEach(p => {
+                        if (p.alpha > 0.01) {
+                            active = true;
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.vy += 0.25; // Simulated gravity pull
+                            p.rotation += p.vRot;
+                            p.alpha -= 0.012; // Gradual fade out
+                            
+                            ctx.save();
+                            ctx.globalAlpha = Math.max(0, p.alpha);
+                            ctx.translate(p.x, p.y);
+                            ctx.rotate(p.rotation);
+                            ctx.font = `${p.size}px serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(p.emoji, 0, 0);
+                            ctx.restore();
+                        }
+                    });
+                    
+                    if (active) {
+                        requestAnimationFrame(animate);
+                    }
+                }
+                
+                animate();
+            })();
+        </script>
+        """
+        st.markdown(firework_html, unsafe_allow_html=True)
 
         # Status Callout
         if "Health" in raw_label:
