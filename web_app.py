@@ -6,10 +6,10 @@ import numpy as np
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for Cute Animations, Glassmorphism & Floating Leaves
+# Custom CSS for Backgrounds, Floating Animations & Bouncing Emojis
 st.markdown("""
 <style>
-    /* Cute Gradient Background */
+    /* Gradient App Background */
     .stApp {
         background: linear-gradient(135deg, #0d1f2d 0%, #1d3557 50%, #112a46 100%);
         color: #f1faee;
@@ -20,17 +20,6 @@ st.markdown("""
         0% { transform: translateY(0px) rotate(0deg); }
         50% { transform: translateY(-10px) rotate(6deg); }
         100% { transform: translateY(0px) rotate(0deg); }
-    }
-
-    @keyframes popIn {
-        0% { transform: scale(0.88); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes pulseGlow {
-        0% { box-shadow: 0 0 15px rgba(168, 255, 120, 0.2); }
-        50% { box-shadow: 0 0 28px rgba(168, 255, 120, 0.45); }
-        100% { box-shadow: 0 0 15px rgba(168, 255, 120, 0.2); }
     }
 
     /* Floating Bouncing Leaf Header Logo */
@@ -62,79 +51,9 @@ st.markdown("""
         margin-bottom: 1.8rem;
     }
 
-    /* Result Container with Animated Pop-in & Leaf Pattern */
-    .result-card {
-        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, pulseGlow 4s infinite;
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 2px solid rgba(168, 255, 120, 0.35);
-        border-radius: 25px;
-        padding: 28px;
-        margin-top: 20px;
-        
-        /* Cute Repeating Leaf Doodle Pattern Background */
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 100 100' opacity='0.12'%3E%3Cpath fill='%23a8ff78' d='M50 15 C30 35 15 60 50 85 C85 60 70 35 50 15 Z M50 25 L50 75 M50 45 L38 35 M50 58 L62 48' stroke='%23a8ff78' stroke-width='3' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
-        background-repeat: repeat;
-    }
-
-    /* Info Headers & Rounded Body Text */
-    .info-header {
-        color: #a8ff78;
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-top: 14px;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .info-body {
-        color: #f1faee;
-        font-size: 1.02rem;
-        background: rgba(0, 0, 0, 0.28);
-        padding: 10px 16px;
-        border-radius: 14px;
-        margin-bottom: 12px;
-        border-left: 4px solid #a8ff78;
-    }
-
-    /* Cute Status Badges */
-    .status-badge-healthy {
-        background: linear-gradient(135deg, #2a9d8f, #e9c46a);
-        color: #03045e;
-        padding: 14px 22px;
+    /* Target Streamlit containers for card styling */
+    div[data-testid="stVerticalBlock"] > div[style*="background-color"] {
         border-radius: 20px;
-        font-weight: 800;
-        font-size: 1.2rem;
-        text-align: center;
-        margin-bottom: 20px;
-        box-shadow: 0 6px 20px rgba(42, 157, 143, 0.4);
-    }
-
-    .status-badge-deficiency {
-        background: linear-gradient(135deg, #e76f51, #f4a261);
-        color: #ffffff;
-        padding: 14px 22px;
-        border-radius: 20px;
-        font-weight: 800;
-        font-size: 1.2rem;
-        text-align: center;
-        margin-bottom: 20px;
-        box-shadow: 0 6px 20px rgba(231, 111, 81, 0.4);
-    }
-
-    .status-badge-diseased {
-        background: linear-gradient(135deg, #e63946, #d62828);
-        color: #ffffff;
-        padding: 14px 22px;
-        border-radius: 20px;
-        font-weight: 800;
-        font-size: 1.2rem;
-        text-align: center;
-        margin-bottom: 20px;
-        box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -155,7 +74,7 @@ try:
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
-    # Clean label loading to strip numbers like "0 Health" -> "Health"
+    # Load and clean label names
     with open("labels.txt", "r") as f:
         labels = [line.strip().split(' ', 1)[-1].strip() for line in f.readlines()]
 
@@ -235,34 +154,29 @@ try:
             "remedy": "Inspect plant for stress signs, maintain consistent soil moisture, and balance organic nutrients."
         })
 
-        # Set status badge styling based on diagnosis type
-        if "Health" in raw_label:
-            badge_class = "status-badge-healthy"
-        elif "Diseased" in raw_label:
-            badge_class = "status-badge-diseased"
-        else:
-            badge_class = "status-badge-deficiency"
+        st.markdown("---")
 
-        # Glassmorphism Animated Result Card
-        st.markdown(f"""
-        <div class="result-card">
-            <div class="{badge_class}">
-                {info['title']} ({confidence:.1f}% Match)
-            </div>
-            
-            <div class="info-header">🌱 Identified Condition / Profile</div>
-            <div class="info-body">{info['category']}</div>
-            
-            <div class="info-header">📍 Common Geographic / Soil Regions</div>
-            <div class="info-body">{info['region']}</div>
-            
-            <div class="info-header">☀️ Environmental Factors & Symptoms</div>
-            <div class="info-body">{info['conditions']}</div>
-            
-            <div class="info-header">💊 Recommended Remedy & Treatment</div>
-            <div class="info-body">{info['remedy']}</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # 1. Top Status Banner using Native Streamlit Callouts
+        if "Health" in raw_label:
+            st.success(f"### 🎉 {info['title']} ({confidence:.1f}% Confidence)")
+        elif "Diseased" in raw_label:
+            st.error(f"### 🚨 {info['title']} ({confidence:.1f}% Confidence)")
+        else:
+            st.warning(f"### ⚠️ {info['title']} ({confidence:.1f}% Confidence)")
+
+        # 2. Beautiful Native Streamlit Container Cards
+        with st.container(border=True):
+            st.subheader("🌱 Identified Condition / Profile")
+            st.info(info["category"])
+
+            st.subheader("📍 Common Geographic & Soil Regions")
+            st.write(info["region"])
+
+            st.subheader("☀️ Environmental Factors & Symptoms")
+            st.write(info["conditions"])
+
+            st.subheader("💊 Recommended Remedy & Treatment")
+            st.success(info["remedy"])
 
 except Exception as e:
     st.error(f"App initialization error: {e}")
