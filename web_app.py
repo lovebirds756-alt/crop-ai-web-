@@ -6,7 +6,7 @@ import numpy as np
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for Backgrounds, Floating Animations & Bouncing Emojis
+# Custom CSS for App Styling, Floating Elements, and Pop-up Doodles
 st.markdown("""
 <style>
     /* Gradient App Background */
@@ -20,6 +20,12 @@ st.markdown("""
         0% { transform: translateY(0px) rotate(0deg); }
         50% { transform: translateY(-10px) rotate(6deg); }
         100% { transform: translateY(0px) rotate(0deg); }
+    }
+
+    @keyframes doodlePop {
+        0% { transform: translateY(20px) scale(0) rotate(-15deg); opacity: 0; }
+        50% { transform: translateY(-10px) scale(1.2) rotate(10deg); opacity: 1; }
+        100% { transform: translateY(-25px) scale(1) rotate(0deg); opacity: 0.85; }
     }
 
     /* Floating Bouncing Leaf Header Logo */
@@ -51,10 +57,21 @@ st.markdown("""
         margin-bottom: 1.8rem;
     }
 
-    /* Target Streamlit containers for card styling */
-    div[data-testid="stVerticalBlock"] > div[style*="background-color"] {
-        border-radius: 20px;
+    /* Animated Doodle Row overlaying the results */
+    .doodle-banner {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        font-size: 2.8rem;
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
+
+    .doodle-1 { animation: doodlePop 0.8s ease-out forwards; }
+    .doodle-2 { animation: doodlePop 1.1s ease-out forwards; }
+    .doodle-3 { animation: doodlePop 0.9s ease-out forwards; }
+    .doodle-4 { animation: doodlePop 1.2s ease-out forwards; }
+    .doodle-5 { animation: doodlePop 1.0s ease-out forwards; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -78,7 +95,7 @@ try:
     with open("labels.txt", "r") as f:
         labels = [line.strip().split(' ', 1)[-1].strip() for line in f.readlines()]
 
-    # Database specifically matching your 6 classes!
+    # Database matching your model classes
     PLANT_DATABASE = {
         "Health": {
             "title": "Healthy Crop Sample ✨",
@@ -145,7 +162,7 @@ try:
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        # Retrieve entry from PLANT_DATABASE using exact label key
+        # Retrieve entry from PLANT_DATABASE
         info = PLANT_DATABASE.get(raw_label, {
             "title": raw_label.replace("_", " "),
             "category": "General Analysis",
@@ -156,15 +173,26 @@ try:
 
         st.markdown("---")
 
-        # 1. Top Status Banner using Native Streamlit Callouts
-        if "Health" in raw_label:
-            st.success(f"### 🎉 {info['title']} ({confidence:.1f}% Confidence)")
-        elif "Diseased" in raw_label:
-            st.error(f"### 🚨 {info['title']} ({confidence:.1f}% Confidence)")
-        else:
-            st.warning(f"### ⚠️ {info['title']} ({confidence:.1f}% Confidence)")
+        # Animated Pop-up Doodles Banner
+        st.markdown("""
+        <div class="doodle-banner">
+            <span class="doodle-1">🍃</span>
+            <span class="doodle-2">✨</span>
+            <span class="doodle-3">🌱</span>
+            <span class="doodle-4">🌾</span>
+            <span class="doodle-5">🌿</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-        # 2. Beautiful Native Streamlit Container Cards
+        # Status Callout
+        if "Health" in raw_label:
+            st.success(f"### 🎉 {info['title']} ({confidence:.1f}% Match)")
+        elif "Diseased" in raw_label:
+            st.error(f"### 🚨 {info['title']} ({confidence:.1f}% Match)")
+        else:
+            st.warning(f"### ⚠️ {info['title']} ({confidence:.1f}% Match)")
+
+        # Native Cards Container
         with st.container(border=True):
             st.subheader("🌱 Identified Condition / Profile")
             st.info(info["category"])
