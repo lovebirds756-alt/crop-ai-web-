@@ -2,15 +2,14 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
-import re
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for Cute Animations, Styling & Floating Elements
+# Custom CSS for Cute Animations, Glassmorphism & Floating Leaves
 st.markdown("""
 <style>
-    /* Cute Dark Gradient Background */
+    /* Cute Gradient Background */
     .stApp {
         background: linear-gradient(135deg, #0d1f2d 0%, #1d3557 50%, #112a46 100%);
         color: #f1faee;
@@ -114,8 +113,20 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(42, 157, 143, 0.4);
     }
 
+    .status-badge-deficiency {
+        background: linear-gradient(135deg, #e76f51, #f4a261);
+        color: #ffffff;
+        padding: 14px 22px;
+        border-radius: 20px;
+        font-weight: 800;
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 20px rgba(231, 111, 81, 0.4);
+    }
+
     .status-badge-diseased {
-        background: linear-gradient(135deg, #e63946, #f4a261);
+        background: linear-gradient(135deg, #e63946, #d62828);
         color: #ffffff;
         padding: 14px 22px;
         border-radius: 20px;
@@ -139,123 +150,58 @@ def load_interpreter():
     interpreter.allocate_tensors()
     return interpreter
 
-def parse_label(raw_label):
-    """
-    Intelligently extracts (plant_name, disease_status) regardless of how raw_label is formatted.
-    Handles 'Apple___healthy', 'Apple___Black_rot', 'Healthy_Tomato', '0 Rice___Bacterial_blight', etc.
-    """
-    # Remove leading numbers/spaces if present (e.g. "0 Apple___healthy")
-    cleaned = re.sub(r'^\d+\s*', '', raw_label).strip()
-
-    # Split by common delimiters like triple/double underscores or dashes
-    if "___" in cleaned:
-        parts = cleaned.split("___")
-    elif "__" in cleaned:
-        parts = cleaned.split("__")
-    elif " - " in cleaned:
-        parts = cleaned.split(" - ")
-    else:
-        parts = [cleaned]
-
-    if len(parts) >= 2:
-        plant = parts[0].replace("_", " ").title()
-        status = parts[1].replace("_", " ").title()
-    else:
-        # Single-word label or reversed label like "Healthy_Tomato"
-        val = parts[0].replace("_", " ")
-        if "healthy" in val.lower():
-            # Extract plant name if label is "Healthy Tomato" or "Tomato Healthy"
-            plant_cleaned = re.sub(r'(?i)\bhealthy\b', '', val).strip()
-            plant = plant_cleaned.title() if plant_cleaned else "Crop Sample"
-            status = "Healthy Leaf"
-        else:
-            plant = val.title()
-            status = "Condition Detected"
-
-    if "healthy" in status.lower():
-        status = "Super Healthy Leaf! ✨"
-
-    return plant, status
-
 try:
     interpreter = load_interpreter()
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
+    # Clean label loading to strip numbers like "0 Health" -> "Health"
     with open("labels.txt", "r") as f:
-        labels = [line.strip().split(' ', 1)[-1] for line in f.readlines()]
+        labels = [line.strip().split(' ', 1)[-1].strip() for line in f.readlines()]
 
-    # Detailed Botanical & Care Info Dictionary
+    # Database specifically matching your 6 classes!
     PLANT_DATABASE = {
-        "Apple___Apple_scab": {
-            "plant_name": "Apple Tree (*Malus domestica*) 🍎",
-            "region": "Central Asian Mountains (Tian Shan), grown in cool temperate zones globally.",
-            "conditions": "Full sunshine (6+ hrs/day), rich loamy soil, cold winter chilling.",
-            "status": "Infected with Apple Scab 🍂",
-            "remedy": "Apply organic copper or sulfur fungicide spray. Rake up fallen leaves to keep soil clean."
+        "Health": {
+            "title": "Healthy Crop Sample ✨",
+            "category": "Optimal Plant Health",
+            "region": "Widespread across temperate, tropical, and subtropical farm zones.",
+            "conditions": "Balanced soil nutrients (NPK), pH 6.0–7.0, adequate sunlight (6-8 hrs/day), consistent moisture.",
+            "remedy": "Your plant is in optimal health! Maintain regular watering, balanced composting, and seasonal sunlight."
         },
-        "Apple___Black_rot": {
-            "plant_name": "Apple Tree (*Malus domestica*) 🍎",
-            "region": "Central Asia, cultivated across Europe, Asia, and North America.",
-            "conditions": "Cool to moderate climate, fertile well-drained soil.",
-            "status": "Infected with Black Rot 🥀",
-            "remedy": "Prune away dead or infected branches during dormant season and destroy mummified fruits."
+        "Diseased": {
+            "title": "Infected / Diseased Sample 🚨",
+            "category": "Pathogenic Stress (Fungal or Bacterial)",
+            "region": "Common in humid or waterlogged agricultural areas globally.",
+            "conditions": "High moisture levels on foliage, poor air circulation, unsterilized soil or tools.",
+            "remedy": "Isolate the plant, remove infected leaves immediately, avoid overhead watering, and apply broad-spectrum organic bio-fungicide or copper spray."
         },
-        "Apple___healthy": {
-            "plant_name": "Apple Tree (*Malus domestica*) 🍎",
-            "region": "Central Asian Mountains, cultivated globally.",
-            "conditions": "Full sunlight, deep fertile soil, consistent watering.",
-            "status": "Super Healthy Leaf! ✨",
-            "remedy": "Your apple tree is thriving! Maintain regular watering and annual winter pruning."
+        "Nitrogen_Deficiency": {
+            "title": "Nitrogen (N) Deficiency 🟡",
+            "category": "Macronutrient Deficiency",
+            "region": "Frequently found in sandy, eroded, or heavily cropped soils lacking organic matter.",
+            "conditions": "Symptom: Pale yellowing (chlorosis) starting on older lower leaves while upper leaves remain pale green.",
+            "remedy": "Apply nitrogen-rich fertilizers such as composted manure, blood meal, ammonium sulfate, or organic fish emulsion."
         },
-        "Corn_(maize)___Common_rust_": {
-            "plant_name": "Corn / Maize (*Zea mays*) 🌽",
-            "region": "Mesoamerica (Southern Mexico), grown in sunny warm climates worldwide.",
-            "conditions": "Warm soil (20°C–32°C), high sunlight, rich nitrogen-fertilized ground.",
-            "status": "Infected with Common Rust 🌽🍂",
-            "remedy": "Ensure proper row spacing for airflow. Apply neem oil or sulfur-based spray if severe."
+        "Phosphorus_Deficiency": {
+            "title": "Phosphorus (P) Deficiency 🟣",
+            "category": "Macronutrient Deficiency",
+            "region": "Common in cold, wet, overly acidic (pH < 5.5) or alkaline soils.",
+            "conditions": "Symptom: Stunted root growth with purplish or dark bronze discoloration on leaf undersides and stems.",
+            "remedy": "Add bone meal, rock phosphate, or balanced high-phosphorus fertilizer. Ensure soil pH is between 6.0–7.0 for optimal absorption."
         },
-        "Corn_(maize)___healthy": {
-            "plant_name": "Corn / Maize (*Zea mays*) 🌽",
-            "region": "Mesoamerica (Mexico), grown in agricultural belts worldwide.",
-            "conditions": "Warm weather, full sun, deep organic soil with steady moisture.",
-            "status": "Super Healthy Leaf! ✨",
-            "remedy": "Looking great! Keep providing balanced nitrogen nutrients during key growth phases."
+        "Potassium_Deficiency": {
+            "title": "Potassium (K) Deficiency 🟠",
+            "category": "Macronutrient Deficiency",
+            "region": "Prevalent in light sandy soils where potassium leaches out easily during heavy rains.",
+            "conditions": "Symptom: Scorched, browned leaf margins (marginal chlorosis/necrosis) with curling leaf tips.",
+            "remedy": "Apply muriate of potash, sulphate of potash, or wood ash. Keep soil moisture steady to prevent nutrient lockup."
         },
-        "Potato___Early_blight": {
-            "plant_name": "Potato Plant (*Solanum tuberosum*) 🥔",
-            "region": "South American Andes (Peru & Bolivia).",
-            "conditions": "Cool climates (15°C–20°C), loose acidic soil (pH 5.0–6.0).",
-            "status": "Infected with Early Blight 🥔🍂",
-            "remedy": "Spray bio-fungicide or copper spray. Avoid splashing water onto foliage during irrigation."
-        },
-        "Potato___Late_blight": {
-            "plant_name": "Potato Plant (*Solanum tuberosum*) 🥔",
-            "region": "South American Andes, cultivated in cool moist zones globally.",
-            "conditions": "Cool weather, high humidity (>90%), light well-drained soil.",
-            "status": "Infected with Late Blight 🚨",
-            "remedy": "Remove infected leaves immediately to stop spreading. Keep soil surface dry."
-        },
-        "Potato___healthy": {
-            "plant_name": "Potato Plant (*Solanum tuberosum*) 🥔",
-            "region": "South American Andes Mountains.",
-            "conditions": "Cool weather, light sandy-loam soil, moderate moisture.",
-            "status": "Super Healthy Leaf! ✨",
-            "remedy": "Healthy plant! Pile extra soil around stem bases to protect developing tubers."
-        },
-        "Tomato___Bacterial_spot": {
-            "plant_name": "Tomato Plant (*Solanum lycopersicum*) 🍅",
-            "region": "Western South America (Andean region).",
-            "conditions": "Full sun, warm temperature (21°C–29°C), rich sandy-loam soil.",
-            "status": "Infected with Bacterial Spot 🍅🦠",
-            "remedy": "Apply copper-based fungicide spray. Water at root level only to keep leaves dry."
-        },
-        "Tomato___healthy": {
-            "plant_name": "Tomato Plant (*Solanum lycopersicum*) 🍅",
-            "region": "South American Andes, grown in home gardens and farms globally.",
-            "conditions": "6-8 hours direct sunshine, warm soil, calcium-rich fertilizer.",
-            "status": "Super Healthy Leaf! ✨",
-            "remedy": "Plant is super happy! Keep soil evenly moist to encourage sweet, healthy tomatoes."
+        "Iron_Deficiency": {
+            "title": "Iron (Fe) Deficiency ⚪",
+            "category": "Micronutrient Deficiency",
+            "region": "Common in high pH (alkalinity > 7.5), overly calcareous, or compacted waterlogged soils.",
+            "conditions": "Symptom: Interveinal chlorosis — young top leaves turn pale yellow or ivory while veins stay dark green.",
+            "remedy": "Apply chelated iron (Fe-EDTA) as a foliar spray or soil drench. Lower soil pH using sulfur or peat moss."
         }
     }
 
@@ -280,38 +226,40 @@ try:
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        # Run smart parser on predicted label
-        parsed_plant, parsed_status = parse_label(raw_label)
-
-        # Retrieve exact details from PLANT_DATABASE or use parsed fallback
+        # Retrieve entry from PLANT_DATABASE using exact label key
         info = PLANT_DATABASE.get(raw_label, {
-            "plant_name": f"{parsed_plant} Plant 🌿",
+            "title": raw_label.replace("_", " "),
+            "category": "General Analysis",
             "region": "Subtropical & Temperate Agricultural Zones.",
             "conditions": "Full sun exposure, well-draining organic soil, moderate watering.",
-            "status": parsed_status,
             "remedy": "Inspect plant for stress signs, maintain consistent soil moisture, and balance organic nutrients."
         })
 
-        is_healthy = "healthy" in raw_label.lower() or "healthy" in parsed_status.lower()
-        badge_class = "status-badge-healthy" if is_healthy else "status-badge-diseased"
+        # Set status badge styling based on diagnosis type
+        if "Health" in raw_label:
+            badge_class = "status-badge-healthy"
+        elif "Diseased" in raw_label:
+            badge_class = "status-badge-diseased"
+        else:
+            badge_class = "status-badge-deficiency"
 
         # Glassmorphism Animated Result Card
         st.markdown(f"""
         <div class="result-card">
             <div class="{badge_class}">
-                {info['status']} ({confidence:.1f}% Match)
+                {info['title']} ({confidence:.1f}% Match)
             </div>
             
-            <div class="info-header">🌱 Identified Plant Species</div>
-            <div class="info-body">{info['plant_name']}</div>
+            <div class="info-header">🌱 Identified Condition / Profile</div>
+            <div class="info-body">{info['category']}</div>
             
-            <div class="info-header">📍 Native / Primary Origin</div>
+            <div class="info-header">📍 Common Geographic / Soil Regions</div>
             <div class="info-body">{info['region']}</div>
             
-            <div class="info-header">☀️ Ideal Growing Conditions</div>
+            <div class="info-header">☀️ Environmental Factors & Symptoms</div>
             <div class="info-body">{info['conditions']}</div>
             
-            <div class="info-header">💊 Recommended Care & Remedy</div>
+            <div class="info-header">💊 Recommended Remedy & Treatment</div>
             <div class="info-body">{info['remedy']}</div>
         </div>
         """, unsafe_allow_html=True)
