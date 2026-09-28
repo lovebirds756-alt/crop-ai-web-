@@ -69,91 +69,91 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Full-Screen Emoji Burst Canvas Overlay Component
+# Full-Screen Parent Canvas Overlay Component
 def render_fullscreen_firework():
     html_code = """
     <!DOCTYPE html>
     <html>
-    <head>
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                background: transparent;
-            }
-            #fullscreenCanvas {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                pointer-events: none;
-                z-index: 99999;
-            }
-        </style>
-    </head>
+    <head></head>
     <body>
-        <canvas id="fullscreenCanvas"></canvas>
         <script>
-            const canvas = document.getElementById('fullscreenCanvas');
-            const ctx = canvas.getContext('2d');
+            (function() {
+                try {
+                    // Access top window document to bypass Streamlit iframe restriction
+                    const parentDoc = window.top.document;
+                    let canvas = parentDoc.getElementById('globalEmojiCanvas');
 
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            const emojis = ['🍃', '✨', '🌱', '🌾', '🌿', '🌸', '💫'];
-            const particles = [];
-
-            // Generate 80 high-powered emoji particles across the entire bottom width
-            for (let i = 0; i < 80; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: canvas.height + 20,
-                    vx: (Math.random() - 0.5) * 14,
-                    vy: -(Math.random() * 16 + 12), // Shoots straight up across full screen height
-                    size: Math.floor(Math.random() * 24 + 32), // Large visible emojis
-                    emoji: emojis[Math.floor(Math.random() * emojis.length)],
-                    alpha: 1,
-                    rotation: Math.random() * Math.PI * 2,
-                    vRot: (Math.random() - 0.5) * 0.2
-                });
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let stillActive = false;
-
-                particles.forEach(p => {
-                    if (p.alpha > 0.01) {
-                        stillActive = true;
-                        p.x += p.vx;
-                        p.y += p.vy;
-                        p.vy += 0.28; // Gravity curve
-                        p.rotation += p.vRot;
-                        p.alpha -= 0.009; // Extended visibility screen transition
-
-                        ctx.save();
-                        ctx.globalAlpha = Math.max(0, p.alpha);
-                        ctx.translate(p.x, p.y);
-                        ctx.rotate(p.rotation);
-                        ctx.font = `${p.size}px serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(p.emoji, 0, 0);
-                        ctx.restore();
+                    if (!canvas) {
+                        canvas = parentDoc.createElement('canvas');
+                        canvas.id = 'globalEmojiCanvas';
+                        canvas.style.position = 'fixed';
+                        canvas.style.top = '0';
+                        canvas.style.left = '0';
+                        canvas.style.width = '100vw';
+                        canvas.style.height = '100vh';
+                        canvas.style.pointerEvents = 'none';
+                        canvas.style.zIndex = '999999';
+                        parentDoc.body.appendChild(canvas);
                     }
-                });
 
-                if (stillActive) {
-                    requestAnimationFrame(animate);
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = window.top.innerWidth;
+                    canvas.height = window.top.innerHeight;
+
+                    const emojis = ['🍃', '✨', '🌱', '🌾', '🌿', '🌸', '💫'];
+                    const particles = [];
+
+                    // Launch 70 emoji particles across the entire viewport width
+                    for (let i = 0; i < 70; i++) {
+                        particles.push({
+                            x: Math.random() * canvas.width,
+                            y: canvas.height + 30,
+                            vx: (Math.random() - 0.5) * 16,
+                            vy: -(Math.random() * 18 + 14), // High upward velocity
+                            size: Math.floor(Math.random() * 26 + 32),
+                            emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                            alpha: 1,
+                            rotation: Math.random() * Math.PI * 2,
+                            vRot: (Math.random() - 0.5) * 0.25
+                        });
+                    }
+
+                    function animate() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        let active = false;
+
+                        particles.forEach(p => {
+                            if (p.alpha > 0.01) {
+                                active = true;
+                                p.x += p.vx;
+                                p.y += p.vy;
+                                p.vy += 0.32; // Natural gravity curve
+                                p.rotation += p.vRot;
+                                p.alpha -= 0.008; // Smooth screen transition fade
+
+                                ctx.save();
+                                ctx.globalAlpha = Math.max(0, p.alpha);
+                                ctx.translate(p.x, p.y);
+                                ctx.rotate(p.rotation);
+                                ctx.font = `${p.size}px serif`;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(p.emoji, 0, 0);
+                                ctx.restore();
+                            }
+                        });
+
+                        if (active) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        }
+                    }
+                    animate();
+                } catch(e) {
+                    console.log("Iframe security restricted parent canvas injection.", e);
                 }
-            }
-            animate();
+            })();
         </script>
     </body>
     </html>
@@ -275,9 +275,9 @@ if st.session_state.page == "upload":
         st.info("Ensure 'model.tflite' and 'labels.txt' are present in your GitHub repository root.")
 
 
-# ==================== SCREEN 2: RESULTS PAGE (NO SCROLL NEEDED) ====================
+# ==================== SCREEN 2: RESULTS PAGE ====================
 elif st.session_state.page == "results":
-    # Launch Full-Screen Firework Transition
+    # Trigger Full-Screen Transition Overlay via Parent Window Injection
     render_fullscreen_firework()
 
     res = st.session_state.analysis_result
