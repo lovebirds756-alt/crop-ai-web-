@@ -6,8 +6,100 @@ import numpy as np
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🔬", layout="centered")
 
-st.title("🔬 Cellular Vision: AI Plant Diagnostics & Botanical Intelligence")
-st.write("Scan or upload a leaf sample to identify the plant species, native origin, ideal growing conditions, and disease diagnostics.")
+# Custom CSS for Leaf Styling & Background Doodles
+st.markdown("""
+<style>
+    /* Main Background Pattern with Botanical Motifs */
+    .stApp {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        color: #e2e8f0;
+    }
+    
+    /* Header Styling */
+    .title-text {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 2.6rem;
+        font-weight: 800;
+        background: linear-gradient(120deg, #a8ff78, #78ffd6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 0.2rem;
+    }
+    
+    .subtitle-text {
+        text-align: center;
+        color: #cbd5e1;
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Result Container with Leaf Doodle Background Pattern */
+    .result-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 20px;
+        padding: 28px;
+        margin-top: 25px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        
+        /* Subtle Leaf Doodle SVG Background Overlay */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 100 100' opacity='0.08'%3E%3Cpath fill='%23a8ff78' d='M50 10 C30 30 10 60 50 90 C90 60 70 30 50 10 Z M50 20 L50 80 M50 40 L35 30 M50 55 L65 45 M50 70 L35 60' stroke='%23a8ff78' stroke-width='2' fill-none'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+    }
+
+    /* Info Field Styling */
+    .info-header {
+        color: #a8ff78;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-body {
+        color: #f1f5f9;
+        font-size: 1.02rem;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    /* Status Badges */
+    .status-badge-healthy {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: #052e16;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        text-align: center;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+    }
+
+    .status-badge-diseased {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        text-align: center;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Custom Header
+st.markdown('<div class="title-text">🍃 Cellular Vision</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle-text">AI Plant Diagnostics & Botanical Intelligence</div>', unsafe_allow_html=True)
 
 @st.cache_resource
 def load_interpreter():
@@ -20,11 +112,9 @@ try:
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
-    # Read model class labels
     with open("labels.txt", "r") as f:
         labels = [line.strip().split(' ', 1)[-1] for line in f.readlines()]
 
-    # Extended botanical & diagnostic database
     PLANT_DATABASE = {
         "Apple___Apple_scab": {
             "plant_name": "Apple (*Malus domestica*)",
@@ -98,22 +188,19 @@ try:
         }
     }
 
-    # Camera & Upload Inputs
-    img_file = st.camera_input("Take a photo using camera") 
+    img_file = st.camera_input("📷 Take a photo using camera") 
     if not img_file:
-        img_file = st.file_uploader("Or upload a leaf image file...", type=["jpg", "png", "jpeg"])
+        img_file = st.file_uploader("📁 Or upload a leaf image file...", type=["jpg", "png", "jpeg"])
 
     if img_file is not None:
         image = Image.open(img_file).convert('RGB')
-        st.image(image, caption='Processed Sample', use_container_width=True)
+        st.image(image, caption='Captured Sample', use_container_width=True)
         
-        # Image Preprocessing
         size = (224, 224)
         image_resample = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
         img_array = np.asarray(image_resample).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
-        # Run AI Inference
         interpreter.set_tensor(input_details[0]['index'], img_array)
         interpreter.invoke()
         output_data = interpreter.get_tensor(output_details[0]['index'])
@@ -122,7 +209,6 @@ try:
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        # Retrieve botanical info from dict or fallback
         info = PLANT_DATABASE.get(raw_label, {
             "plant_name": raw_label.split("___")[0].replace("_", " "),
             "region": "Subtropical & Temperate Agricultural Zones.",
@@ -131,22 +217,29 @@ try:
             "remedy": "Inspect plant for signs of stress, maintain moisture levels, and balance soil nutrients."
         })
 
-        st.markdown("---")
-        
-        # Display Botanical & Geographic Context
-        st.subheader(f"🌱 Plant Species: {info['plant_name']}")
-        st.write(f"**📍 Native / Primary Region:** {info['region']}")
-        st.write(f"**☀️ Ideal Growing Conditions:** {info['conditions']}")
-        
-        st.markdown("---")
-        
-        # Display Health & Remedial Actions
-        if "healthy" in raw_label.lower():
-            st.success(f"**Health Status:** {info['status']} ({confidence:.1f}% Match)")
-            st.info(f"**Action:** {info['remedy']}")
-        else:
-            st.error(f"**Health Status:** {info['status']} ({confidence:.1f}% Match)")
-            st.warning(f"**Recommended Remedy:** {info['remedy']}")
+        is_healthy = "healthy" in raw_label.lower()
+        badge_class = "status-badge-healthy" if is_healthy else "status-badge-diseased"
+
+        # Glassmorphism Result Card with Doodle Background
+        st.markdown(f"""
+        <div class="result-card">
+            <div class="{badge_class}">
+                {info['status']} ({confidence:.1f}% Confidence)
+            </div>
+            
+            <div class="info-header">🌱 Identified Plant Species</div>
+            <div class="info-body">{info['plant_name']}</div>
+            
+            <div class="info-header">📍 Native / Primary Region</div>
+            <div class="info-body">{info['region']}</div>
+            
+            <div class="info-header">☀️ Ideal Growing Conditions</div>
+            <div class="info-body">{info['conditions']}</div>
+            
+            <div class="info-header">💊 Recommended Action / Remedy</div>
+            <div class="info-body">{info['remedy']}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 except Exception as e:
     st.error(f"App initialization error: {e}")
