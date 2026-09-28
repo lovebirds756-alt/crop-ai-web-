@@ -2,11 +2,12 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
+import streamlit.components.v1 as components
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for Full-Screen Bouncing/Popping Doodles
+# Custom CSS for App Styling
 st.markdown("""
 <style>
     /* Gradient App Background */
@@ -50,34 +51,38 @@ st.markdown("""
         font-weight: 500;
         margin-bottom: 1.8rem;
     }
-
-    /* Full Screen Pop-up Doodle Animations */
-    @keyframes popUpDoodle {
-        0% { transform: scale(0) translateY(50px) rotate(-30deg); opacity: 0; }
-        60% { transform: scale(1.4) translateY(-15px) rotate(15deg); opacity: 1; }
-        100% { transform: scale(1) translateY(0px) rotate(0deg); opacity: 1; }
-    }
-
-    .doodle-container {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        font-size: 3rem;
-        margin: 15px 0;
-    }
-
-    .doodle-item {
-        display: inline-block;
-        animation: popUpDoodle 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    .d1 { animation-delay: 0.1s; }
-    .d2 { animation-delay: 0.2s; }
-    .d3 { animation-delay: 0.3s; }
-    .d4 { animation-delay: 0.4s; }
-    .d5 { animation-delay: 0.5s; }
 </style>
 """, unsafe_allow_html=True)
+
+# Function to trigger plant emoji confetti burst
+def trigger_emoji_firework():
+    js_code = """
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        const plantEmojis = ['🍃', '✨', '🌱', '🌾', '🌿'];
+        
+        function fireEmojiBurst() {
+            if (window.confetti) {
+                const scalar = 3;
+                const leafShape = plantEmojis.map(emoji => confetti.shapeFromText({ text: emoji, scalar }));
+                
+                // Firework burst shooting up from center-bottom
+                window.parent.confetti({
+                    shapes: leafShape,
+                    scalar: scalar,
+                    particleCount: 45,
+                    spread: 80,
+                    startVelocity: 45,
+                    origin: { y: 0.8 },
+                    ticks: 300
+                });
+            }
+        }
+        
+        setTimeout(fireEmojiBurst, 300);
+    </script>
+    """
+    components.html(js_code, height=0)
 
 # Header Section
 st.markdown('<div class="cute-logo">🍃🌱🔬</div>', unsafe_allow_html=True)
@@ -166,8 +171,8 @@ try:
         raw_label = labels[predicted_index]
         confidence = output_data[0][predicted_index] * 100
 
-        # Triggers floating balloon doodles across the entire browser screen!
-        st.balloons()
+        # Trigger custom emoji firework burst (🍃, ✨, 🌱, 🌾, 🌿)
+        trigger_emoji_firework()
 
         # Retrieve entry from PLANT_DATABASE
         info = PLANT_DATABASE.get(raw_label, {
@@ -179,17 +184,6 @@ try:
         })
 
         st.markdown("---")
-
-        # Bouncing Doodle Row
-        st.markdown("""
-        <div class="doodle-container">
-            <span class="doodle-item d1">🍃</span>
-            <span class="doodle-item d2">✨</span>
-            <span class="doodle-item d3">🌱</span>
-            <span class="doodle-item d4">🌾</span>
-            <span class="doodle-item d5">🌿</span>
-        </div>
-        """, unsafe_allow_html=True)
 
         # Status Callout
         if "Health" in raw_label:
