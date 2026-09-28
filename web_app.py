@@ -4,9 +4,9 @@ from PIL import Image, ImageOps
 import numpy as np
 
 # Page configuration
-st.set_page_config(page_title="SCERT AI Crop & Flora Diagnostics", page_icon="🌿", layout="centered")
+st.set_page_config(page_title="Cellular Vision", page_icon="🔬", layout="centered")
 
-st.title("🌿 SCERT AI Plant Scanner & Botanical Guide")
+st.title("🔬 Cellular Vision: AI Plant Diagnostics & Botanical Intelligence")
 st.write("Scan or upload a leaf sample to identify the plant species, native origin, ideal growing conditions, and disease diagnostics.")
 
 @st.cache_resource
