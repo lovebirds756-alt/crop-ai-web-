@@ -2,11 +2,12 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
+import streamlit.components.v1 as components
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
 
-# Custom CSS for App Styling & High-Visibility Plant Firework
+# Custom CSS for App Styling
 st.markdown("""
 <style>
     /* Gradient App Background */
@@ -50,17 +51,86 @@ st.markdown("""
         font-weight: 500;
         margin-bottom: 1.8rem;
     }
-
-    /* Firework Canvas Container */
-    .firework-canvas-container {
-        width: 100%;
-        height: 250px;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: -40px;
-    }
 </style>
 """, unsafe_allow_html=True)
+
+# Function to render HTML5 Canvas Emoji Firework Burst
+def render_emoji_firework():
+    html_code = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+            canvas { display: block; width: 100%; height: 200px; }
+        </style>
+    </head>
+    <body>
+        <canvas id="fireworkCanvas"></canvas>
+        <script>
+            const canvas = document.getElementById('fireworkCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = 200;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const emojis = ['🍃', '✨', '🌱', '🌾', '🌿'];
+            const particles = [];
+
+            // Generate 35 plant emoji particles
+            for (let i = 0; i < 35; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() * 80 - 40),
+                    y: canvas.height - 10,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: -(Math.random() * 9 + 7), // High upward shoot velocity
+                    size: Math.floor(Math.random() * 16 + 28),
+                    emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                    alpha: 1,
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.15
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let stillActive = false;
+
+                particles.forEach(p => {
+                    if (p.alpha > 0.01) {
+                        stillActive = true;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.22; // Gravity effect
+                        p.rotation += p.vRot;
+                        p.alpha -= 0.012; // Gradual fade out
+
+                        ctx.save();
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation);
+                        ctx.font = `${p.size}px serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(p.emoji, 0, 0);
+                        ctx.restore();
+                    }
+                });
+
+                if (stillActive) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            animate();
+        </script>
+    </body>
+    </html>
+    """
+    components.html(html_code, height=210)
 
 # Header Section
 st.markdown('<div class="cute-logo">🍃🌱🔬</div>', unsafe_allow_html=True)
@@ -160,72 +230,8 @@ try:
 
         st.markdown("---")
 
-        # HTML5 Canvas Animation Shooting Plant Emojis UP like Fireworks
-        firework_html = """
-        <div class="firework-canvas-container">
-            <canvas id="emojiCanvas"></canvas>
-        </div>
-        <script>
-            (function() {
-                const canvas = document.getElementById('emojiCanvas');
-                const ctx = canvas.getContext('2d');
-                
-                canvas.width = canvas.parentElement.clientWidth;
-                canvas.height = 250;
-                
-                const emojis = ['🍃', '✨', '🌱', '🌾', '🌿'];
-                const particles = [];
-                
-                // Spawn 25 emoji particles with upward firework trajectory
-                for (let i = 0; i < 25; i++) {
-                    particles.push({
-                        x: canvas.width / 2 + (Math.random() * 60 - 30),
-                        y: canvas.height - 10,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: -(Math.random() * 8 + 8), // High upward velocity
-                        size: Math.random() * 16 + 24, // Large visible font size
-                        emoji: emojis[Math.floor(Math.random() * emojis.length)],
-                        alpha: 1,
-                        rotation: Math.random() * Math.PI * 2,
-                        vRot: (Math.random() - 0.5) * 0.1
-                    });
-                }
-                
-                function animate() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    let active = false;
-                    particles.forEach(p => {
-                        if (p.alpha > 0.01) {
-                            active = true;
-                            p.x += p.vx;
-                            p.y += p.vy;
-                            p.vy += 0.25; // Simulated gravity pull
-                            p.rotation += p.vRot;
-                            p.alpha -= 0.012; // Gradual fade out
-                            
-                            ctx.save();
-                            ctx.globalAlpha = Math.max(0, p.alpha);
-                            ctx.translate(p.x, p.y);
-                            ctx.rotate(p.rotation);
-                            ctx.font = `${p.size}px serif`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText(p.emoji, 0, 0);
-                            ctx.restore();
-                        }
-                    });
-                    
-                    if (active) {
-                        requestAnimationFrame(animate);
-                    }
-                }
-                
-                animate();
-            })();
-        </script>
-        """
-        st.markdown(firework_html, unsafe_allow_html=True)
+        # Launch the Canvas Firework animation
+        render_emoji_firework()
 
         # Status Callout
         if "Health" in raw_label:
