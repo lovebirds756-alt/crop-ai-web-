@@ -1,4 +1,6 @@
 streamlit
-tensorflow-cpu
+tensorflow
 pillow
 numpy
+reportlab
+pyserial
