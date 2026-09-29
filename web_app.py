@@ -34,7 +34,7 @@ st.markdown("""
 <style>
     .main-header { font-size: 2.2rem; color: #1b4332; font-weight: bold; text-align: center; margin-bottom: 0px; }
     .sub-header { font-size: 1.1rem; color: #2a9d8f; text-align: center; margin-bottom: 20px; }
-    .card { background-color: #f8f9fa; border-radius: 10px; padding: 15px; border: 1px solid #e9ecef; }
+    .metric-card { background-color: #f8f9fa; border-radius: 10px; padding: 15px; border-left: 5px solid #2a9d8f; margin-bottom: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -50,7 +50,6 @@ labels = [
 
 @st.cache_resource
 def load_tflite_model():
-    """Loads and caches the TFLite MobileNet model."""
     interpreter = tf.lite.Interpreter(model_path="model.tflite")
     interpreter.allocate_tensors()
     return interpreter
@@ -64,14 +63,12 @@ except Exception as e:
     model_loaded = False
     st.error(f"Error loading model.tflite: {e}")
 
-# Hardware Serial Initializer
 def send_serial_command(command, port="COM3", baudrate=9600):
-    """Sends a single-byte opcode to Arduino over PySerial."""
     if not SERIAL_AVAILABLE:
         return "Serial library not installed."
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
-        time.sleep(1.5)  # Wait for Arduino connection reset
+        time.sleep(1.5)
         ser.write(command.encode())
         ser.close()
         return f"Signal '{command}' sent to {port}."
@@ -82,7 +79,6 @@ def send_serial_command(command, port="COM3", baudrate=9600):
 # 3. REPORT GENERATOR FUNCTIONS
 # ==========================================
 def generate_text_report(disease_name, confidence, status_type, pH_range, remedies):
-    """Generates a structured plain-text diagnostic report."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     report_text = f"""
 ====================================================================
@@ -113,7 +109,6 @@ Zero Cloud Latency • Offline Edge Inference • IoT Hardware Telemetry
 
 
 def generate_pdf_report(disease_name, confidence, status_type, pH_range, remedies):
-    """Generates an executive PDF report in memory using ReportLab."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -224,16 +219,15 @@ com_port = st.sidebar.text_input("Arduino COM Port", value="COM3")
 enable_hardware = st.sidebar.checkbox("Enable Serial Hardware", value=False)
 
 # File Input Mode
-input_mode = st.radio("Choose Input Method:", ["📁 Upload Foliar Image", "📸 Live Camera"])
+input_mode = st.radio("Select Input Method:", ["📁 Upload Foliar Image", "📸 Live Camera"])
 
 uploaded_file = None
 if input_mode == "📁 Upload Foliar Image":
-    uploaded_file = st.file_uploader("Upload leaf sample (JPG/PNG)...", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Choose a leaf image sample...", type=["jpg", "jpeg", "png"])
 else:
-    uploaded_file = st.camera_input("Snap a live photo of the leaf")
+    uploaded_file = st.camera_input("Snap a live photo of a leaf")
 
 if uploaded_file is not None and model_loaded:
-    # Render Image & Prepare Input Tensor
     image = Image.open(uploaded_file).convert("RGB")
     
     col_img, col_res = st.columns([1, 1])
@@ -241,7 +235,7 @@ if uploaded_file is not None and model_loaded:
     with col_img:
         st.image(image, caption="Uploaded Foliar Sample", use_container_width=True)
 
-    # Image Preprocessing (224x224 input for MobileNet)
+    # Image Preprocessing
     img_resized = image.resize((224, 224))
     input_data = np.expand_dims(np.array(img_resized, dtype=np.float32) / 255.0, axis=0)
 
@@ -255,51 +249,58 @@ if uploaded_file is not None and model_loaded:
     confidence_score = float(output_data[pred_idx] * 100) if max(output_data) <= 1.0 else float(output_data[pred_idx])
     raw_label = labels[pred_idx] if pred_idx < len(labels) else "Unknown Condition"
 
-    # Determine Severity & Hardware Signal
+    # Severity Mapping & Hardware Control
     if "Healthy" in raw_label:
         status_type = "Healthy"
-        signal = "H"  # Green LED
+        signal = "H"
         ph_range = "6.0 - 7.0"
         status_color = "green"
-        remedies = "• Plant physiological status is nominal.\n• Maintain regular irrigation schedule.\n• Continue monitoring soil electrical conductivity (EC)."
+        remedies = "1. Plant physiological status is nominal.\n2. Maintain regular irrigation schedule.\n3. Continue monitoring soil electrical conductivity (EC)."
     elif "Blight" in raw_label or "Rust" in raw_label or "Spot" in raw_label:
         status_type = "Infected (Biotic Stress)"
-        signal = "I"  # Red LED
+        signal = "I"
         ph_range = "5.8 - 6.5"
         status_color = "red"
-        remedies = "• Isolate affected foliage immediately to limit spore dispersion.\n• Apply organic bio-fungicide or copper hydroxide spray.\n• Transition to drip irrigation to keep leaf canopy dry."
+        remedies = "1. Isolate affected foliage immediately to limit spore dispersion.\n2. Apply organic bio-fungicide or copper hydroxide spray.\n3. Transition to drip irrigation to keep leaf canopy dry."
     else:
         status_type = "Deficient (Abiotic Stress)"
-        signal = "D"  # Yellow LED
+        signal = "D"
         ph_range = "6.2 - 6.8"
         status_color = "orange"
-        remedies = "• Perform macronutrient soil analysis (N, P, K, Fe).\n• Supplement with foliar organic chelated iron or compost tea.\n• Buffer soil pH to optimal zone for root absorption."
+        remedies = "1. Perform macronutrient soil analysis (N, P, K, Fe).\n2. Supplement with foliar organic chelated iron or compost tea.\n3. Buffer soil pH to optimal zone for root absorption."
 
-    # Trigger Arduino Hardware Signal if Enabled
     if enable_hardware:
         hw_status = send_serial_command(signal, port=com_port)
         st.sidebar.info(hw_status)
 
-    # Display Results in UI
+    # Display Results in original Card Layout
     with col_res:
         st.markdown(f"### Diagnostic Result")
         st.markdown(f"**Identified Condition:** `{raw_label}`")
         st.progress(min(int(confidence_score), 100))
         st.markdown(f"**Confidence:** `{confidence_score:.2f}%`")
-        st.markdown(f"**Status:** :{status_color}[{status_type}]")
-        st.markdown(f"**Target Soil pH:** `{ph_range}`")
         
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>Health Classification</h4>
+            <p style="color:{status_color}; font-size:1.2rem; font-weight:bold; margin:0;">{status_type}</p>
+        </div>
+        <div class="metric-card">
+            <h4>Recommended Soil pH Target</h4>
+            <p style="font-size:1.1rem; font-weight:bold; margin:0;">{ph_range}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
         st.markdown("---")
-        st.markdown("**Actionable Protocol:**")
+        st.markdown("**Actionable Remediation Protocol:**")
         st.text(remedies)
 
     # ==========================================
-    # 5. ONE-CLICK EXPORT SECTION
+    # 5. ONE-CLICK PDF & TEXT REPORT EXPORT
     # ==========================================
     st.markdown("---")
     st.subheader("📄 Export Diagnostic Summary Report")
 
-    # Generate PDF & Text buffers on the fly
     text_report = generate_text_report(raw_label, confidence_score, status_type, ph_range, remedies)
     pdf_buffer = generate_pdf_report(raw_label, confidence_score, status_type, ph_range, remedies)
 
