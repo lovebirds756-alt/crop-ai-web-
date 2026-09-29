@@ -1,8 +1,15 @@
+import io
 import streamlit as st
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
 import streamlit.components.v1 as components
+
+# ReportLab Imports for PDF Generation
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 # Page configuration
 st.set_page_config(page_title="Cellular Vision", page_icon="🍃", layout="centered")
@@ -168,6 +175,116 @@ def load_interpreter():
     return interpreter
 
 
+# Helper function to generate PDF bytes
+def generate_pdf_report(res):
+    info = res["info"]
+    confidence = res["confidence"]
+    pil_image = res["image"]
+
+    pdf_buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        pdf_buffer,
+        pagesize=letter,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
+
+    styles = getSampleStyleSheet()
+    
+    # Custom Palette
+    primary_color = colors.HexColor("#1d3557")
+    accent_color = colors.HexColor("#2a9d8f")
+    dark_neutral = colors.HexColor("#2b2d42")
+
+    title_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=22,
+        textColor=primary_color,
+        spaceAfter=4
+    )
+    subtitle_style = ParagraphStyle(
+        'DocSubtitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Oblique',
+        fontSize=10,
+        textColor=colors.HexColor("#6c757d"),
+        spaceAfter=15
+    )
+    section_heading = ParagraphStyle(
+        'SectionHeading',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=13,
+        textColor=accent_color,
+        spaceBefore=10,
+        spaceAfter=4
+    )
+    body_style = ParagraphStyle(
+        'BodyTextCustom',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=10,
+        leading=14,
+        textColor=dark_neutral
+    )
+
+    elements = []
+
+    # Title & Header
+    elements.append(Paragraph("Cellular Vision — Plant Health Report", title_style))
+    elements.append(Paragraph("AI-Powered Botanical Diagnosis & Treatment Plan", subtitle_style))
+    elements.append(Spacer(1, 5))
+
+    # Leaf Image Processing for ReportLab
+    img_byte_arr = io.BytesIO()
+    pil_image.save(img_byte_arr, format='JPEG')
+    img_byte_arr.seek(0)
+    rl_img = RLImage(img_byte_arr, width=160, height=160)
+
+    # Summary Table
+    clean_title = info['title'].replace("✨", "").replace("🚨", "").replace("🟡", "").replace("🟣", "").replace("🟠", "").replace("⚪", "").strip()
+    
+    summary_data = [
+        [Paragraph("<b>Condition:</b>", body_style), Paragraph(clean_title, body_style)],
+        [Paragraph("<b>Confidence:</b>", body_style), Paragraph(f"{confidence:.1f}%", body_style)],
+        [Paragraph("<b>Category:</b>", body_style), Paragraph(info['category'], body_style)],
+    ]
+    summary_table = Table(summary_data, colWidths=[90, 240])
+    summary_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    ]))
+
+    # Top Layout Table (Image + Summary side by side)
+    layout_table = Table([[rl_img, summary_table]], colWidths=[180, 340])
+    layout_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ALIGN', (0,0), (0,0), 'CENTER'),
+    ]))
+    elements.append(layout_table)
+    elements.append(Spacer(1, 15))
+
+    # Content Sections
+    sections = [
+        ("📍 Common Geographic & Soil Regions", info["region"]),
+        ("☀️ Environmental Factors & Diagnostic Symptoms", info["conditions"]),
+        ("💊 Recommended Remedy & Agricultural Treatment Plan", info["remedy"].replace("\n", "<br/>"))
+    ]
+
+    for heading, text in sections:
+        elements.append(Paragraph(heading, section_heading))
+        elements.append(Paragraph(text, body_style))
+        elements.append(Spacer(1, 8))
+
+    doc.build(elements)
+    pdf_buffer.seek(0)
+    return pdf_buffer.getvalue()
+
+
 # Expanded Botanical & Agricultural Database
 PLANT_DATABASE = {
     "Health": {
@@ -319,3 +436,15 @@ elif st.session_state.page == "results":
 
         st.subheader("💊 Recommended Remedy & Agricultural Treatment Plan")
         st.success(info["remedy"])
+
+    st.markdown("---")
+
+    # Download PDF Report Option
+    pdf_bytes = generate_pdf_report(res)
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_bytes,
+        file_name="cellular_vision_report.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
