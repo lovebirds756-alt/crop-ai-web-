@@ -12,8 +12,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 # Page Configuration - Enterprise Agronomy Diagnostics
 st.set_page_config(
-    page_title="Cellular Vision | Enterprise Crop Diagnostics",
-    page_icon="🔬",
+    page_title="LeafSpec AI | Enterprise Crop Diagnostics",
+    page_icon="🍃",
     layout="centered"
 )
 
@@ -24,8 +24,10 @@ if "analysis_result" not in st.session_state:
     st.session_state.analysis_result = None
 if "selected_lang" not in st.session_state:
     st.session_state.selected_lang = "Hindi (हिंदी)"
+if "upload_attempts" not in st.session_state:
+    st.session_state.upload_attempts = 0
 
-# Strict Industrial / Laboratory UI Design CSS
+# Strict Industrial / Laboratory UI Design CSS with Creative Hybrid Logo Styling
 st.markdown("""
 <style>
     /* Dark Industrial Agronomy Theme */
@@ -35,20 +37,14 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    /* Enterprise Header Bar */
+    /* Enterprise Creative Header & Logo */
     .brand-header {
         border-bottom: 2px solid #334155;
         padding-bottom: 16px;
         margin-bottom: 24px;
-    }
-
-    .brand-title {
-        font-size: 2.1rem;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        color: #F8FAFC;
-        margin: 0;
-        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .brand-subtitle {
@@ -103,10 +99,14 @@ st.markdown("""
 # Multilingual Technical Dictionary
 UI_TEXT = {
     "English": {
-        "title": "CELLULAR VISION",
+        "title": "LEAFSPEC AI",
         "subtitle": "SCERT Autonomous Crop Pathology & Nutrient Diagnostic Platform",
         "lang_step": "System Operating Language / भाषा का चयन",
         "scan_step": "Foliar Image Acquisition & Sensor Input",
+        "questionnaire_step": "Field Parameters & Agronomic Profile",
+        "q1": "1. What is your regional soil type?",
+        "q2": "2. What is your estimated budget category for treatment/fertilizers?",
+        "q3": "3. What is the current irrigation / drainage condition?",
         "camera_input": "Activate High-Resolution Camera Capture",
         "file_input": "Or Load Image File from Local System...",
         "sample_loaded": "Foliar Sample Matrix Loaded",
@@ -123,10 +123,14 @@ UI_TEXT = {
         "confidence": "Diagnostic Certainty Index"
     },
     "Hindi (हिंदी)": {
-        "title": "सेल्यूलर विज़न (CELLULAR VISION)",
+        "title": "लीफस्पेक एआई (LEAFSPEC AI)",
         "subtitle": "एससीईआरटी स्वचालित फसल रोग एवं पोषक तत्व निदान प्रणाली",
         "lang_step": "प्रणाली की भाषा चुनें / System Operating Language",
         "scan_step": "पत्ती का फोटो लें या नमूना दर्ज करें",
+        "questionnaire_step": "क्षेत्रीय पैरामीटर और कृषि प्रोफ़ाइल (प्रश्नावली)",
+        "q1": "1. आपकी मिट्टी का प्रकार क्या है?",
+        "q2": "2. उपचार या उर्वरक के लिए आपका अनुमानित बजट क्या है?",
+        "q3": "3. खेत में सिंचाई और जल निकासी की वर्तमान स्थिति कैसी है?",
         "camera_input": "कैमरा चालू करें और पत्ती का चित्र लें",
         "file_input": "या डिवाइस से पत्ती का चित्र अपलोड करें...",
         "sample_loaded": "जांच हेतु पत्ती का नमूना सफलतापूर्वक लोड हुआ",
@@ -143,10 +147,14 @@ UI_TEXT = {
         "confidence": "निदान सटीकता सूचकांक"
     },
     "Punjabi (ਪੰਜਾਬੀ)": {
-        "title": "ਸੈਲੂਲਰ ਵਿਜ਼ਨ (CELLULAR VISION)",
+        "title": "ਲੀਫਸਪੈਕ ਏ.ਆਈ. (LEAFSPEC AI)",
         "subtitle": "ਐਸ.ਸੀ.ਈ.ਆਰ.ਟੀ. ਫਸਲ ਬਿਮਾਰੀ ਅਤੇ ਨਿਦਾਨ ਪ੍ਰਣਾਲੀ",
         "lang_step": "ਸਿਸਟਮ ਦੀ ਭਾਸ਼ਾ ਚੁਣੋ / Select Operating Language",
         "scan_step": "ਪੱਤੇ ਦਾ ਨਮੂਨਾ ਦਰਜ ਕਰੋ",
+        "questionnaire_step": "ਖੇਤਰ ਦੀ ਸਥਿਤੀ ਅਤੇ ਪ੍ਰੋਫਾਈਲ (ਸਵਾਲਨਾਮਾ)",
+        "q1": "1. ਤੁਹਾਡੀ ਜ਼ਮੀਨ / ਮਿੱਟੀ ਦੀ ਕਿਸਮ ਕੀ ਹੈ?",
+        "q2": "2. ਇਲਾਜ ਜਾਂ ਖਾਦਾਂ ਲਈ ਤੁਹਾਡਾ ਬਜਟ ਕਿੰਨਾ ਹੈ?",
+        "q3": "3. ਖੇਤ ਵਿੱਚ ਪਾਣੀ ਦੀ ਨਿਕਾਸੀ ਅਤੇ ਸਿੰਚਾਈ ਦਾ ਕੀ ਹਾਲ ਹੈ?",
         "camera_input": "ਕੈਮਰਾ ਚਾਲੂ ਕਰੋ ਅਤੇ ਪੱਤੇ ਦੀ ਫੋਟੋ ਲਵੋ",
         "file_input": "ਜਾਂ ਫਾਈਲ ਵਿੱਚੋਂ ਫੋਟੋ ਅੱਪਲੋਡ ਕਰੋ...",
         "sample_loaded": "ਨਮੂਨਾ ਜਾਂਚ ਲਈ ਤਿਆਰ ਹੈ",
@@ -333,6 +341,29 @@ def load_interpreter():
     return interpreter
 
 
+def validate_leaf_image(pil_img):
+    """
+    Validates if the image has characteristics of a green/organic leaf specimen.
+    Checks RGB channel dominance and variance to reject blank walls, faces, or random non-foliar objects.
+    """
+    img_np = np.array(pil_img)
+    r, g, b = img_np[:, :, 0], img_np[:, :, 1], img_np[:, :, 2]
+    
+    # Check if green channel is reasonably prominent or if image has healthy color variation
+    mean_g = np.mean(g)
+    mean_r = np.mean(r)
+    mean_b = np.mean(b)
+    
+    # Simple heuristic: foliage typically has green dominance or natural organic texture variance
+    color_variance = np.var(img_np)
+    
+    # If it's totally dark, completely white, or a solid non-green block with low variance
+    if color_variance < 350.0:
+        return False
+    
+    return True
+
+
 def generate_pdf_report(res, lang):
     info = res["info"]
     confidence = res["confidence"]
@@ -345,218 +376,3 @@ def generate_pdf_report(res, lang):
         pagesize=letter,
         rightMargin=36,
         leftMargin=36,
-        topMargin=36,
-        bottomMargin=36
-    )
-
-    styles = getSampleStyleSheet()
-    primary_color = colors.HexColor("#0F172A")
-    accent_color = colors.HexColor("#0284C7")
-    dark_neutral = colors.HexColor("#1E293B")
-
-    title_style = ParagraphStyle(
-        'DocTitle', parent=styles['Heading1'],
-        fontName='Helvetica-Bold', fontSize=18,
-        textColor=primary_color, spaceAfter=2
-    )
-    subtitle_style = ParagraphStyle(
-        'DocSubtitle', parent=styles['Normal'],
-        fontName='Helvetica-Bold', fontSize=8,
-        textColor=colors.HexColor("#64748B"), spaceAfter=12
-    )
-    section_heading = ParagraphStyle(
-        'SectionHeading', parent=styles['Heading2'],
-        fontName='Helvetica-Bold', fontSize=11,
-        textColor=accent_color, spaceBefore=8, spaceAfter=4
-    )
-    body_style = ParagraphStyle(
-        'BodyTextCustom', parent=styles['Normal'],
-        fontName='Helvetica', fontSize=9, leading=13, textColor=dark_neutral
-    )
-
-    elements = []
-    
-    # Official Header
-    elements.append(Paragraph("CELLULAR VISION — AGRONOMIC PATHOLOGY REPORT", title_style))
-    elements.append(Paragraph(f"SYSTEM EVALUATION REPORT | {txt['subtitle']}", subtitle_style))
-    elements.append(HRFlowable(width="100%", thickness=1.5, color=primary_color, spaceBefore=1, spaceAfter=10))
-
-    # Leaf Image
-    img_byte_arr = io.BytesIO()
-    pil_image.save(img_byte_arr, format='JPEG')
-    img_byte_arr.seek(0)
-    rl_img = RLImage(img_byte_arr, width=140, height=140)
-
-    # Diagnostic Summary Table
-    summary_data = [
-        [Paragraph(f"<b>{txt['condition']}:</b>", body_style), Paragraph(info['title'], body_style)],
-        [Paragraph(f"<b>{txt['confidence']}:</b>", body_style), Paragraph(f"{confidence:.2f}% Certainty Index", body_style)],
-        [Paragraph(f"<b>{txt['category']}:</b>", body_style), Paragraph(info['category'], body_style)],
-    ]
-    summary_table = Table(summary_data, colWidths=[130, 230])
-    summary_table.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
-    ]))
-
-    layout_table = Table([[rl_img, summary_table]], colWidths=[150, 370])
-    layout_table.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('ALIGN', (0,0), (0,0), 'CENTER'),
-    ]))
-    elements.append(layout_table)
-    elements.append(Spacer(1, 10))
-    elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#CBD5E1"), spaceBefore=4, spaceAfter=8))
-
-    # Long Form Diagnostic Sections
-    sections = [
-        (txt["region"], info["region"]),
-        (txt["symptoms"], info["symptoms"]),
-        (txt["action_plan"], info["action_plan"].replace("\n", "<br/>")),
-        (txt["preventive"], info["preventive"])
-    ]
-
-    for heading, text in sections:
-        elements.append(Paragraph(heading.upper(), section_heading))
-        elements.append(Paragraph(text, body_style))
-        elements.append(Spacer(1, 6))
-
-    doc.build(elements)
-    pdf_buffer.seek(0)
-    return pdf_buffer.getvalue()
-
-
-# ==================== SCREEN 1: UPLOAD & ACQUISITION ====================
-if st.session_state.page == "upload":
-    
-    # Industrial Enterprise Title Bar
-    st.markdown("""
-    <div class="brand-header">
-        <div class="brand-title">CELLULAR VISION</div>
-        <div class="brand-subtitle">SCERT Autonomous Crop Pathology & Nutrient Diagnostic System</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # STEP 1: Mandatory Language Selection BEFORE photo taking
-    with st.container(border=True):
-        st.markdown(f'<div class="section-label">STEP 1: SYSTEM LANGUAGE SELECTION</div>', unsafe_allow_html=True)
-        selected_lang = st.selectbox(
-            label="Language Selection",
-            options=["Hindi (हिंदी)", "Punjabi (ਪੰਜਾਬੀ)", "English"],
-            index=["Hindi (हिंदी)", "Punjabi (ਪੰਜਾਬੀ)", "English"].index(st.session_state.selected_lang),
-            label_visibility="collapsed"
-        )
-        st.session_state.selected_lang = selected_lang
-
-    txt = UI_TEXT[st.session_state.selected_lang]
-
-    # STEP 2: Camera Capture or File Upload
-    with st.container(border=True):
-        st.markdown(f'<div class="section-label">STEP 2: {txt["scan_step"].upper()}</div>', unsafe_allow_html=True)
-        
-        try:
-            interpreter = load_interpreter()
-            input_details = interpreter.get_input_details()
-            output_details = interpreter.get_output_details()
-
-            with open("labels.txt", "r") as f:
-                labels = [line.strip().split(' ', 1)[-1].strip() for line in f.readlines()]
-
-            img_file = st.camera_input(txt['camera_input'], label_visibility="collapsed")
-            
-            if not img_file:
-                st.write("---")
-                img_file = st.file_uploader(txt['file_input'], type=["jpg", "png", "jpeg"])
-
-            if img_file is not None:
-                image = Image.open(img_file).convert('RGB')
-                st.image(image, caption=txt['sample_loaded'], use_container_width=True)
-
-                if st.button(txt['analyze_btn'], use_container_width=True, type="primary"):
-                    # TFLite Model Execution
-                    size = (224, 224)
-                    image_resample = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
-                    img_array = np.asarray(image_resample).astype(np.float32) / 255.0
-                    img_array = np.expand_dims(img_array, axis=0)
-
-                    interpreter.set_tensor(input_details[0]['index'], img_array)
-                    interpreter.invoke()
-                    output_data = interpreter.get_tensor(output_details[0]['index'])
-
-                    predicted_index = np.argmax(output_data[0])
-                    raw_label = labels[predicted_index]
-                    confidence = output_data[0][predicted_index] * 100
-
-                    # Retrieve localized deep agronomic database profile
-                    lang_db = PLANT_DATABASE.get(raw_label, PLANT_DATABASE["Diseased"])
-                    info = lang_db.get(st.session_state.selected_lang, lang_db["English"])
-
-                    st.session_state.analysis_result = {
-                        "info": info,
-                        "confidence": confidence,
-                        "raw_label": raw_label,
-                        "image": image
-                    }
-                    st.session_state.page = "results"
-                    st.rerun()
-
-        except Exception as e:
-            st.error(f"System Error: {e}")
-            st.info("Ensure 'model.tflite' and 'labels.txt' are present in your root directory.")
-
-
-# ==================== SCREEN 2: EXTENDED DIAGNOSTIC REPORT ====================
-elif st.session_state.page == "results":
-    res = st.session_state.analysis_result
-    info = res["info"]
-    confidence = res["confidence"]
-    raw_label = res["raw_label"]
-    txt = UI_TEXT[st.session_state.selected_lang]
-
-    # Executive Navigation
-    col_nav, col_title = st.columns([1, 3])
-    with col_nav:
-        if st.button(txt['back_btn']):
-            st.session_state.page = "upload"
-            st.session_state.analysis_result = None
-            st.rerun()
-
-    with col_title:
-        st.markdown(f"<h3 style='margin:0; padding:0; color:#F8FAFC;'>{txt['report_header']}</h3>", unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # Primary Diagnosis Card
-    with st.container(border=True):
-        st.markdown(f'<div class="section-label">{txt["condition"].upper()}</div>', unsafe_allow_html=True)
-        st.markdown(f"## {info['title']}")
-        st.markdown(f"**{txt['confidence']}:** {confidence:.2f}% Certainty Index")
-
-    # Long-Form Detailed Agronomic Sections
-    with st.container(border=True):
-        st.markdown(f'<div class="section-label">{txt["category"].upper()}</div>', unsafe_allow_html=True)
-        st.info(info["category"])
-
-        st.markdown(f'<div class="section-label">{txt["region"].upper()}</div>', unsafe_allow_html=True)
-        st.write(info["region"])
-
-        st.markdown(f'<div class="section-label">{txt["symptoms"].upper()}</div>', unsafe_allow_html=True)
-        st.write(info["symptoms"])
-
-        st.markdown(f'<div class="section-label">{txt["action_plan"].upper()}</div>', unsafe_allow_html=True)
-        st.success(info["action_plan"])
-
-        st.markdown(f'<div class="section-label">{txt["preventive"].upper()}</div>', unsafe_allow_html=True)
-        st.warning(info["preventive"])
-
-    st.markdown("---")
-
-    # Download Long PDF Report Option
-    pdf_bytes = generate_pdf_report(res, st.session_state.selected_lang)
-    st.download_button(
-        label=txt['download_pdf'],
-        data=pdf_bytes,
-        file_name="cellular_vision_agronomic_report.pdf",
-        mime="application/pdf",
-        use_container_width=True
-    )
