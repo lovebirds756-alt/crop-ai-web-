@@ -249,7 +249,7 @@ PLANT_DATABASE = {
             "category": "ਮੁੱਖ ਖੁਰਾਕੀ ਤੱਤ ਦੀ ਘਾਟ (ਪੱਤਿਆਂ ਦਾ ਪੀਲਾਪਣ)",
             "region": "ਰੇਤਲੀਆਂ ਜ਼ਮੀਨਾਂ ਅਤੇ ਵੱਧ ਬਾਰਿਸ਼ ਵਾਲੇ ਖੇਤਰਾਂ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਹੇਠਲੇ ਪੁਰਾਣੇ ਪੱਤਿਆਂ ਤੋਂ ਪੀਲਾਪਣ ਸ਼ੁਰੂ ਹੋ ਕੇ ਉੱਪਰ ਵੱਲ ਵਧਦਾ ਹੈ। ਪੌਦੇ ਦਾ ਵਾਧਾ ਰੁਕ ਜਾਂਦਾ ਹੈ।",
-            "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਯੂਰੀਆ (25 ਕਿੱਲੋ/ਏਕੜ) ਦੀ ਵਰਤੋਂ ਕਰੋ।\n2. ਸਪਰੇਅ: 1% ਯੂਰੀਆ ਦੇ ਘੋਲ (10 ਗ੍ਰਾਮ/ਲੀਟਰ) ਦਾ ਪੱਤਿਆਂ 'ਤੇ ਛਿੜਕਾਅ ਕਰੋ।\n3. ਜੈਵਿਕ ਖਾਦ: ਰੂੜੀ ਜਾਂ ਵਰਮੀਕੰਪੋਸਟ ਮਿੱਟੀ ਵਿੱਚ ਮਿਲਾਓ।",
+            "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਯੂਰੀਆ (25 ਕਿੱਲੋ/ਏਕੜ) ਦੀ ਵਰਤੋਂ ਕਰੋ።\n2. ਸਪਰੇਅ: 1% ਯੂਰੀਆ ਦੇ ਘੋਲ (10 ਗ੍ਰਾਮ/ਲੀਟਰ) ਦਾ ਪੱਤਿਆਂ 'ਤੇ ਛਿੜਕਾਅ ਕਰੋ।\n3. ਜੈਵਿਕ ਖਾਦ: ਰੂੜੀ ਜਾਂ ਵਰਮੀਕੰਪੋਸਟ ਮਿੱਟੀ ਵਿੱਚ ਮਿਲਾਓ।",
             "preventive": "ਫਲੀਦਾਰ ਫਸਲਾਂ (ਜਿਵੇਂ ਮੂੰਗੀ, ਰਵਾਂਹ) ਦੀ ਬਜਾਈ ਕਰੋ ਤਾਂ ਜੋ ਮਿੱਟੀ ਦੀ ਉਪਜਾਊ ਸ਼ਕਤੀ ਬਣੀ ਰਹੇ।"
         }
     },
@@ -342,25 +342,11 @@ def load_interpreter():
 
 
 def validate_leaf_image(pil_img):
-    """
-    Validates if the image has characteristics of a green/organic leaf specimen.
-    Checks RGB channel dominance and variance to reject blank walls, faces, or random non-foliar objects.
-    """
     img_np = np.array(pil_img)
     r, g, b = img_np[:, :, 0], img_np[:, :, 1], img_np[:, :, 2]
-    
-    # Check if green channel is reasonably prominent or if image has healthy color variation
-    mean_g = np.mean(g)
-    mean_r = np.mean(r)
-    mean_b = np.mean(b)
-    
-    # Simple heuristic: foliage typically has green dominance or natural organic texture variance
     color_variance = np.var(img_np)
-    
-    # If it's totally dark, completely white, or a solid non-green block with low variance
     if color_variance < 350.0:
         return False
-    
     return True
 
 
@@ -376,3 +362,274 @@ def generate_pdf_report(res, lang):
         pagesize=letter,
         rightMargin=36,
         leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    styles = getSampleStyleSheet()
+    primary_color = colors.HexColor("#0F172A")
+    accent_color = colors.HexColor("#0284C7")
+    dark_neutral = colors.HexColor("#1E293B")
+
+    title_style = ParagraphStyle(
+        'DocTitle', parent=styles['Heading1'],
+        fontName='Helvetica-Bold', fontSize=18,
+        textColor=primary_color, spaceAfter=2
+    )
+    subtitle_style = ParagraphStyle(
+        'DocSubtitle', parent=styles['Normal'],
+        fontName='Helvetica-Bold', fontSize=8,
+        textColor=colors.HexColor("#64748B"), spaceAfter=12
+    )
+    section_heading = ParagraphStyle(
+        'SectionHeading', parent=styles['Heading2'],
+        fontName='Helvetica-Bold', fontSize=11,
+        textColor=accent_color, spaceBefore=8, spaceAfter=4
+    )
+    body_style = ParagraphStyle(
+        'BodyTextCustom', parent=styles['Normal'],
+        fontName='Helvetica', fontSize=9, leading=13, textColor=dark_neutral
+    )
+
+    elements = []
+    
+    # Official Header
+    elements.append(Paragraph("LEAFSPEC AI — AGRONOMIC PATHOLOGY REPORT", title_style))
+    elements.append(Paragraph(f"SYSTEM EVALUATION REPORT | {txt['subtitle']}", subtitle_style))
+    elements.append(HRFlowable(width="100%", thickness=1.5, color=primary_color, spaceBefore=1, spaceAfter=10))
+
+    # Leaf Image
+    img_byte_arr = io.BytesIO()
+    pil_image.save(img_byte_arr, format='JPEG')
+    img_byte_arr.seek(0)
+    rl_img = RLImage(img_byte_arr, width=140, height=140)
+
+    # Diagnostic Summary Table
+    summary_data = [
+        [Paragraph(f"<b>{txt['condition']}:</b>", body_style), Paragraph(info['title'], body_style)],
+        [Paragraph(f"<b>{txt['confidence']}:</b>", body_style), Paragraph(f"{confidence:.2f}% Certainty Index", body_style)],
+        [Paragraph(f"<b>{txt['category']}:</b>", body_style), Paragraph(info['category'], body_style)],
+    ]
+    summary_table = Table(summary_data, colWidths=[130, 230])
+    summary_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    ]))
+
+    layout_table = Table([[rl_img, summary_table]], colWidths=[150, 370])
+    layout_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ALIGN', (0,0), (0,0), 'CENTER'),
+    ]))
+    elements.append(layout_table)
+    elements.append(Spacer(1, 10))
+    elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#CBD5E1"), spaceBefore=4, spaceAfter=8))
+
+    # Long Form Diagnostic Sections
+    sections = [
+        (txt["region"], info["region"]),
+        (txt["symptoms"], info["symptoms"]),
+        (txt["action_plan"], info["action_plan"].replace("\n", "<br/>")),
+        (txt["preventive"], info["preventive"])
+    ]
+
+    for heading, text in sections:
+        elements.append(Paragraph(heading.upper(), section_heading))
+        elements.append(Paragraph(text, body_style))
+        elements.append(Spacer(1, 6))
+
+    doc.build(elements)
+    pdf_buffer.seek(0)
+    return pdf_buffer.getvalue()
+
+
+# ==================== SCREEN 1: UPLOAD & ACQUISITION ====================
+if st.session_state.page == "upload":
+    
+    # Industrial Enterprise Title Bar with Creative Hybrid Logo
+    st.markdown("""
+    <div class="brand-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <svg width="46" height="46" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#1E293B" stroke="#10B981" stroke-width="4"/>
+                <path d="M50 20C35 35 30 50 35 70C55 75 70 60 70 45C70 30 55 20 50 20Z" fill="#34D399" opacity="0.85"/>
+                <path d="M35 70L65 40" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="32" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 4"/>
+            </svg>
+            <div>
+                <div style="font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; color: #F8FAFC; text-transform: uppercase; line-height: 1;">LEAFSPEC AI</div>
+                <div class="brand-subtitle">SCERT Autonomous Crop Pathology & Nutrient Diagnostic System</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # STEP 1: Mandatory Language Selection BEFORE photo taking
+    with st.container(border=True):
+        st.markdown(f'<div class="section-label">STEP 1: SYSTEM LANGUAGE SELECTION</div>', unsafe_allow_html=True)
+        selected_lang = st.selectbox(
+            label="Language Selection",
+            options=["Hindi (हिंदी)", "Punjabi (ਪੰਜਾਬੀ)", "English"],
+            index=["Hindi (हिंदी)", "Punjabi (ਪੰਜਾਬੀ)", "English"].index(st.session_state.selected_lang),
+            label_visibility="collapsed"
+        )
+        st.session_state.selected_lang = selected_lang
+
+    txt = UI_TEXT[st.session_state.selected_lang]
+
+    # STEP 2: Camera Capture or File Upload
+    with st.container(border=True):
+        st.markdown(f'<div class="section-label">STEP 2: {txt["scan_step"].upper()}</div>', unsafe_allow_html=True)
+        
+        img_file = st.camera_input(txt['camera_input'], label_visibility="collapsed")
+        
+        if not img_file:
+            st.write("---")
+            img_file = st.file_uploader(txt['file_input'], type=["jpg", "png", "jpeg"])
+
+        if img_file is not None:
+            image = Image.open(img_file).convert('RGB')
+            
+            # Smart 1-Strike Leaf Validation Logic
+            is_valid_leaf = validate_leaf_image(image)
+            
+            if not is_valid_leaf and st.session_state.upload_attempts == 0:
+                st.session_state.upload_attempts += 1
+                st.error("⚠️ **Sensor Error:** Image does not clearly display an organic leaf specimen or has poor lighting. Please re-click or upload a clear, focused photo of the leaf inside your scanner box.")
+            else:
+                if is_valid_leaf:
+                    st.session_state.upload_attempts = 0
+                
+                st.image(image, caption=txt['sample_loaded'], use_container_width=True)
+
+                # STEP 3: Interactive Questionnaire (MCQs for accuracy & personalization)
+                st.write("---")
+                st.markdown(f'<div class="section-label">STEP 3: {txt["questionnaire_step"].upper()}</div>', unsafe_allow_html=True)
+                
+                soil_type = st.selectbox(
+                    txt["q1"], 
+                    ["Loamy / Alluvial (चिकनी दोमट)", "Sandy / Coarse (बलुई / रेतीली)", "Clayey / Heavy (भारी चिकनी)", "Saline / Alkaline (खारी / क्षारीय)"]
+                )
+                budget_category = st.selectbox(
+                    txt["q2"], 
+                    ["Low Cost / Organic Remedies (कम बजट / जैविक)", "Moderate / Standard Treatment (मध्यम बजट)", "Commercial / Intensive Fertilizer Plan (व्यापारीक / उच्च बजट)"]
+                )
+                drainage_cond = st.selectbox(
+                    txt["q3"], 
+                    ["Optimal Drainage / Drip Irrigation (संतुलित जल निकासी)", "Waterlogged / High Humidity (जलजमाव / अत्यधिक नमी)", "Dry / Rainfed (सूखा / वर्षा आधारित)"]
+                )
+
+                if st.button(txt['analyze_btn'], use_container_width=True, type="primary"):
+                    try:
+                        interpreter = load_interpreter()
+                        input_details = interpreter.get_input_details()
+                        output_details = interpreter.get_output_details()
+
+                        with open("labels.txt", "r") as f:
+                            labels = [line.strip().split(' ', 1)[-1].strip() for line in f.readlines()]
+
+                        # TFLite Model Execution
+                        size = (224, 224)
+                        image_resample = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+                        img_array = np.asarray(image_resample).astype(np.float32) / 255.0
+                        img_array = np.expand_dims(img_array, axis=0)
+
+                        interpreter.set_tensor(input_details[0]['index'], img_array)
+                        interpreter.invoke()
+                        output_data = interpreter.get_tensor(output_details[0]['index'])
+
+                        predicted_index = np.argmax(output_data[0])
+                        raw_label = labels[predicted_index]
+                        confidence = output_data[0][predicted_index] * 100
+
+                        # Retrieve localized deep agronomic database profile
+                        lang_db = PLANT_DATABASE.get(raw_label, PLANT_DATABASE["Diseased"])
+                        info = lang_db.get(st.session_state.selected_lang, lang_db["English"])
+
+                        st.session_state.analysis_result = {
+                            "info": info,
+                            "confidence": confidence,
+                            "raw_label": raw_label,
+                            "image": image,
+                            "user_profile": {
+                                "soil": soil_type,
+                                "budget": budget_category,
+                                "drainage": drainage_cond
+                            }
+                        }
+                        st.session_state.page = "results"
+                        st.rerun()
+
+                    except Exception as e:
+                        st.error(f"System Error: {e}")
+                        st.info("Ensure 'model.tflite' and 'labels.txt' are present in your root directory.")
+
+
+# ==================== SCREEN 2: EXTENDED DIAGNOSTIC REPORT (TABBED VIEW) ====================
+elif st.session_state.page == "results":
+    res = st.session_state.analysis_result
+    info = res["info"]
+    confidence = res["confidence"]
+    raw_label = res["raw_label"]
+    txt = UI_TEXT[st.session_state.selected_lang]
+
+    # Executive Navigation
+    col_nav, col_title = st.columns([1, 3])
+    with col_nav:
+        if st.button(txt['back_btn']):
+            st.session_state.page = "upload"
+            st.session_state.analysis_result = None
+            st.rerun()
+
+    with col_title:
+        st.markdown(f"<h3 style='margin:0; padding:0; color:#F8FAFC;'>{txt['report_header']}</h3>", unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Primary Diagnosis Card
+    with st.container(border=True):
+        st.markdown(f'<div class="section-label">{txt["condition"].upper()}</div>', unsafe_allow_html=True)
+        st.markdown(f"## {info['title']}")
+        st.markdown(f"**{txt['confidence']}:** {confidence:.2f}% Certainty Index")
+
+    # TABBED VIEW TO AVOID LONG SCROLLING
+    tab1, tab2, tab3, tab4 = st.tabs([
+        f"📋 {txt['category']}", 
+        f"🔬 {txt['symptoms']}", 
+        f"💊 {txt['action_plan']}", 
+        f"🛡️ {txt['preventive']}"
+    ])
+
+    with tab1:
+        with st.container(border=True):
+            st.markdown(f'<div class="section-label">{txt["category"].upper()}</div>', unsafe_allow_html=True)
+            st.info(info["category"])
+            st.markdown(f'<div class="section-label">{txt["region"].upper()}</div>', unsafe_allow_html=True)
+            st.write(info["region"])
+
+    with tab2:
+        with st.container(border=True):
+            st.markdown(f'<div class="section-label">{txt["symptoms"].upper()}</div>', unsafe_allow_html=True)
+            st.write(info["symptoms"])
+
+    with tab3:
+        with st.container(border=True):
+            st.markdown(f'<div class="section-label">{txt["action_plan"].upper()}</div>', unsafe_allow_html=True)
+            st.success(info["action_plan"])
+
+    with tab4:
+        with st.container(border=True):
+            st.markdown(f'<div class="section-label">{txt["preventive"].upper()}</div>', unsafe_allow_html=True)
+            st.warning(info["preventive"])
+
+    st.markdown("---")
+
+    # Download Long PDF Report Option
+    pdf_bytes = generate_pdf_report(res, st.session_state.selected_lang)
+    st.download_button(
+        label=txt['download_pdf'],
+        data=pdf_bytes,
+        file_name="leafspec_ai_agronomic_report.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
