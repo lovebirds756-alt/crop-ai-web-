@@ -1,6 +1,6 @@
 streamlit
 tensorflow
-pillow
+Pillow
 numpy
+gtts
 reportlab
-pyserial
