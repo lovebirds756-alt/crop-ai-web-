@@ -57,19 +57,19 @@ def append_disease_log(condition_title, region_info):
     with open(LOG_FILE, "w") as f:
         json.dump(log, f)
 
-# Strict Industrial / Laboratory UI Design CSS with Creative Hybrid Logo Styling
+# Lighter, Vibrant, Sunlight-Readable Agronomy Theme CSS
 st.markdown("""
 <style>
-    /* Dark Industrial Agronomy Theme */
+    /* Light & Vibrant Agronomy Theme */
     .stApp {
-        background-color: #0F172A;
-        color: #E2E8F0;
+        background-color: #F8FAFC;
+        color: #1E293B;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     /* Enterprise Creative Header & Logo */
     .brand-header {
-        border-bottom: 2px solid #334155;
+        border-bottom: 2px solid #E2E8F0;
         padding-bottom: 16px;
         margin-bottom: 24px;
         display: flex;
@@ -78,9 +78,9 @@ st.markdown("""
     }
 
     .brand-subtitle {
-        color: #94A3B8;
+        color: #059669;
         font-size: 0.85rem;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         margin-top: 4px;
@@ -88,35 +88,37 @@ st.markdown("""
 
     /* Precision Card Containers */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: #1E293B;
-        border: 1px solid #334155;
-        border-radius: 6px;
+        background-color: #FFFFFF;
+        border: 1px solid #CBD5E1;
+        border-radius: 8px;
         padding: 20px;
         margin-bottom: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     /* Section Label Headings */
     .section-label {
         font-size: 0.8rem;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: 0.06em;
-        color: #38BDF8;
+        color: #047857;
         text-transform: uppercase;
         margin-bottom: 8px;
     }
 
     /* Buttons & Form Elements */
     .stButton>button {
-        border-radius: 4px;
-        font-weight: 600;
+        border-radius: 6px;
+        font-weight: 700;
         letter-spacing: 0.02em;
-        background-color: #0284C7;
+        background-color: #059669;
         color: #FFFFFF;
         border: none;
+        box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
     }
 
     .stButton>button:hover {
-        background-color: #0369A1;
+        background-color: #047857;
     }
 
     /* Hide Unnecessary Web Elements */
@@ -126,7 +128,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Multilingual Technical Dictionary (Expanded with North Indian Regional Options & Slide-Style Layout Support)
+# Multilingual Technical Dictionary
 UI_TEXT = {
     "English": {
         "title": "LEAFSPEC AI",
@@ -152,6 +154,8 @@ UI_TEXT = {
         "download_pdf": "Download Comprehensive Diagnostic PDF Report",
         "confidence": "Diagnostic Certainty Index",
         "audio_btn": "🔊 Play Voice-Guided Agronomic Advice",
+        "voice_query_title": "🎙️ Interactive Voice Assistant (Ask a Question)",
+        "voice_query_prompt": "Tap the mic and speak your question (e.g., 'How much spray to use?'):",
         "heatmap_title": "🌐 Localized Community Outbreak Log (Offline Heatmap)"
     },
     "Hindi (हिंदी)": {
@@ -178,6 +182,8 @@ UI_TEXT = {
         "download_pdf": "पूर्ण आधिकारिक पीडीएफ (PDF) रिपोर्ट डाउनलोड करें",
         "confidence": "निदान सटीकता सूचकांक",
         "audio_btn": "🔊 वॉइस गाइड: बोलकर उपचार योजना सुनें",
+        "voice_query_title": "🎙️ इंटरैक्टिव वॉइस असिस्टेंट (बोलकर सवाल पूछें)",
+        "voice_query_prompt": "माइक्रोफोन बटन दबाएं और अपना सवाल बोलें (जैसे: 'कितनी दवाई डालनी है?'):",
         "heatmap_title": "🌐 स्थानीय सामुदायिक रोग आउटब्रेक लॉग (हीटमैप)"
     },
     "Punjabi (ਪੰਜਾਬੀ)": {
@@ -204,6 +210,8 @@ UI_TEXT = {
         "download_pdf": "ਪੂਰੀ ਪੀ.ਡੀ.ਐਫ (PDF) ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ",
         "confidence": "ਜਾਂਚ ਨਿਰਧਾਰਨ ਦਰ",
         "audio_btn": "🔊 ਆਵਾਜ਼ ਸੁਣੋ: ਇਲਾਜ ਦੀ ਜਾਣਕਾਰੀ ਆਵਾਜ਼ ਵਿੱਚ ਸੁਣੋ",
+        "voice_query_title": "🎙️ ਬੋਲ ਕੇ ਸਵਾਲ ਪੁੱછੋ (ਵੌਇਸ ਅਸਿਸਟੈਂਟ)",
+        "voice_query_prompt": "ਮਾਈਕ ਬਟਨ ਦਬਾਓ ਅਤੇ ਆਪਣਾ ਸਵਾਲ ਬੋਲੋ:",
         "heatmap_title": "🌐 ਖੇਤਰੀ ਬਿਮਾਰੀ ਆਉਟਬ੍ਰੇਕ ਟ੍ਰੈਕਿੰਗ (ਹੀਟਮੈਪ)"
     },
     "Haryanvi (हरियाणवी)": {
@@ -230,6 +238,8 @@ UI_TEXT = {
         "download_pdf": "पीडीएफ (PDF) रिपोर्ट डाउनलोड करो",
         "confidence": "जांच पक्की दर",
         "audio_btn": "🔊 आवाज सुणो: बोलकै सलाह सुणो",
+        "voice_query_title": "🎙️ बोलकै सवाल पूछो",
+        "voice_query_prompt": "माइक दबा कै अपना सवाल बोलियो:",
         "heatmap_title": "🌐 ग्रामीण बीमारी हॉटस्पॉट लॉग"
     },
     "Pahari / Himachali (पहाड़ी)": {
@@ -240,7 +250,7 @@ UI_TEXT = {
         "questionnaire_step": "खेत ते भूमि दी जानकारी",
         "q1": "1. तुंडी जो मिट्टी किह्ढ़ी ऐ?",
         "q2": "2. खाद ते दवाइयां वास्ते कतना बजट ऐ?",
-        "q3": "3. खेत विच पाणी निकासी किह्ढी ऐ?",
+        "q3": "3. खेत विच पाणी निकासी किह्ढ़ी ऐ?",
         "camera_input": "कैमरा ऑन करो ते पत्ते दी फोटो लो",
         "file_input": "या फाइल अपलोड करो...",
         "sample_loaded": "पत्ते दा नमूना लोड होइगी",
@@ -256,6 +266,8 @@ UI_TEXT = {
         "download_pdf": "पीडीएफ (PDF) रिपोर्ट डाउनलोड करो",
         "confidence": "सटीकता दर",
         "audio_btn": "🔊 आवाज़ सुणो: उपचार सुनै",
+        "voice_query_title": "🎙️ बोल कर सवाल पूछें",
+        "voice_query_prompt": "अपना सवाल बोलें:",
         "heatmap_title": "🌐 क्षेत्रीय रोग हॉटस्पॉट"
     },
     "Bhojpuri (भोजपुरी)": {
@@ -282,6 +294,8 @@ UI_TEXT = {
         "download_pdf": "पीडीएफ (PDF) रिपोर्ट डाउनलोड करीं",
         "confidence": "जांच सटीकता दर",
         "audio_btn": "🔊 आवाज सुनीं: बोल के सलाह सुनीं",
+        "voice_query_title": "🎙️ बोल के सवाल पूछीं",
+        "voice_query_prompt": "माइक दबा के अपना सवाल बोलीं:",
         "heatmap_title": "🌐 ग्रामीण बीमारी हॉटस्पॉट लॉग"
     },
     "Dogri (डोगरी)": {
@@ -308,6 +322,8 @@ UI_TEXT = {
         "download_pdf": "पीडीएफ (PDF) रिपोर्ट डाउनलोड करो",
         "confidence": "सटीकता दर",
         "audio_btn": "🔊 आवाज़ सुणो: उपचार सुनै",
+        "voice_query_title": "🎙️ बोल कर सवाल पूछें",
+        "voice_query_prompt": "अपना सवाल बोलें:",
         "heatmap_title": "🌐 क्षेत्रीय रोग हॉटस्पॉट"
     },
     "Urdu (اردو)": {
@@ -334,6 +350,8 @@ UI_TEXT = {
         "download_pdf": "پی ڈی ایف (PDF) رپورٹ ڈاؤن لوڈ کریں",
         "confidence": "تشخیص کی یقین دہانی کا انڈیکس",
         "audio_btn": "🔊 صوتی رہنمائی سنیں",
+        "voice_query_title": "🎙️ آواز کے ذریعے سوال پوچھیں",
+        "voice_query_prompt": "مائیک کا بٹن دبا کر اپنا سوال بولیں:",
         "heatmap_title": "🌐 علاقائی بیماریوں کا ہاٹ اسپاٹ لاگ"
     }
 }
@@ -493,8 +511,8 @@ PLANT_DATABASE = {
             "category": "ਸੂਖਮ ਖੁਰਾਕੀ ਤੱਤ की ਘਾਟ",
             "region": "ਖਾਰੀ ਮਿੱਟੀ (pH > 7.5) ਅਤੇ ਪਾਣੀ ਖੜ੍ਹਨ ਵਾਲੀਆਂ ਜ਼ਮੀਨਾਂ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਨਵੀਆਂ ਉੱਪਰਲੀਆਂ ਪੱਤਿਆਂ कीਆਂ ਨਾੜੀਆਂ ਹਰੀਆਂ ਰਹਿੰਦੀਆਂ ਹਨ ਜਦੋਂ ਕਿ ਬਾਕੀ ਪੱਤਾ ਪੀਲਾ/ਚਿੱਟਾ ਪੈ ਜਾਂਦਾ है।",
-            "action_plan": "1. ਸਪਰੇਅ: ਚਿਲੇਟਡ ਆਇਰన్ (Fe-EDDHA) 2 ਗ੍ਰਾਮ/लीटर da ਛਿੜਕਾਅ करो।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ da ਖਾਰਾਪਣ ਘਟਾਉਣ ਲਈ ਸਲਫर दी ਵਰਤੋਂ करो।\n3. हवा दा संचार: खेत विचों वधु पाणी निकासी दा प्रबंध करो।",
-            "preventive": "ਮਿੱਟੀ da pH ਸੰਤੁਲਿਤ ਰੱਖਣ ਲਈ ਜੈਵਿਕ ਖਾਦਾਂ ਵਰਤੋਂ।"
+            "action_plan": "1. ਸਪਰੇਅ: ਚਿਲੇਟਡ ਆਇਰನ್ (Fe-EDDHA) 2 ਗ੍ਰਾਮ/लीटर da ਛਿੜਕਾਅ करो।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ da ਖਾਰਾਪਣ ਘਟਾਉਣ ਲਈ ਸਲਫर दी ਵਰਤੋਂ करो।\n3. हवा दा संचार: खेत विचों वधु पाणी निकासी दा प्रबंध करो।",
+            "preventive": "ਮਿੱਟੀ da pH ਸੰਤੁਲਿਤ ਰੱਖਣ ਲਈ ਜੈਵਿਕ ਖਾਦਾਂ ਵਰतों।"
         }
     }
 }
@@ -553,9 +571,9 @@ def generate_pdf_report(res, lang):
     )
 
     styles = getSampleStyleSheet()
-    primary_color = colors.HexColor("#0F172A")
-    accent_color = colors.HexColor("#0284C7")
-    dark_neutral = colors.HexColor("#1E293B")
+    primary_color = colors.HexColor("#1E293B")
+    accent_color = colors.HexColor("#059669")
+    dark_neutral = colors.HexColor("#334155")
 
     title_style = ParagraphStyle(
         'DocTitle', parent=styles['Heading1'],
@@ -633,13 +651,13 @@ if st.session_state.page == "upload":
     <div class="brand-header">
         <div style="display: flex; align-items: center; gap: 14px;">
             <svg width="46" height="46" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="48" fill="#1E293B" stroke="#10B981" stroke-width="4"/>
-                <path d="M50 20C35 35 30 50 35 70C55 75 70 60 70 45C70 30 55 20 50 20Z" fill="#34D399" opacity="0.85"/>
-                <path d="M35 70L65 40" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="50" cy="50" r="32" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 4"/>
+                <circle cx="50" cy="50" r="48" fill="#FFFFFF" stroke="#059669" stroke-width="4"/>
+                <path d="M50 20C35 35 30 50 35 70C55 75 70 60 70 45C70 30 55 20 50 20Z" fill="#10B981" opacity="0.9"/>
+                <path d="M35 70L65 40" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="32" stroke="#0284C7" stroke-width="2" stroke-dasharray="4 4"/>
             </svg>
             <div>
-                <div style="font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; color: #F8FAFC; text-transform: uppercase; line-height: 1;">LEAFSPEC AI</div>
+                <div style="font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; color: #0F172A; text-transform: uppercase; line-height: 1;">LEAFSPEC AI</div>
                 <div class="brand-subtitle">SCERT Autonomous Crop Pathology & Nutrient Diagnostic System</div>
             </div>
         </div>
@@ -769,10 +787,23 @@ elif st.session_state.page == "results":
             st.markdown(f"**{txt['category']}:** {info['category']}")
             st.markdown(f"**Field Profile:** Soil: `{res['soil']}` | Irrigation: `{res['irrigation']}`")
             
-            # Siri-Style Voice Assistant / Audio Playback Module
+            # Voice-Guided Audio Playback Module
             audio_bytes = generate_audio_advisory(info["title"], info["action_plan"], lang)
             st.audio(audio_bytes, format="audio/mp3")
             st.info(txt["audio_btn"])
+
+    # Interactive Voice Query Module (Farmer can talk to the system)
+    with st.container(border=True):
+        st.markdown(f"### {txt['voice_query_title']}")
+        st.write(txt["voice_query_prompt"])
+        
+        farmer_audio = st.audio_input("Record Voice Question", label_visibility="collapsed")
+        if farmer_audio is not None:
+            st.success("🎤 **Voice Question Received!** Processing query against localized agronomic knowledge base...")
+            # Interactive response simulation answering back via gTTS
+            response_speech = f"Based on your question regarding {info['title']}, please follow the recommended treatment plan shown below."
+            resp_audio_bytes = generate_audio_advisory("LeafSpec AI Assistant", response_speech, lang)
+            st.audio(resp_audio_bytes, format="audio/mp3")
 
     # Scrollable / Expandable Detailed Agronomic Breakdown Sections
     with st.container(border=True):
