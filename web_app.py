@@ -57,7 +57,7 @@ def append_disease_log(condition_title, region_info):
     with open(LOG_FILE, "w") as f:
         json.dump(log, f)
 
-# Lighter, Vibrant, Sunlight-Readable Agronomy Theme CSS
+# Lighter, Vibrant, Sunlight-Readable Agronomy Theme CSS with Dashboard Polishing
 st.markdown("""
 <style>
     /* Light & Vibrant Agronomy Theme */
@@ -210,7 +210,7 @@ UI_TEXT = {
         "download_pdf": "ਪੂਰੀ ਪੀ.ਡੀ.ਐਫ (PDF) ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ",
         "confidence": "ਜਾਂਚ ਨਿਰਧਾਰਨ ਦਰ",
         "audio_btn": "🔊 ਆਵਾਜ਼ ਸੁਣੋ: ਇਲਾਜ ਦੀ ਜਾਣਕਾਰੀ ਆਵਾਜ਼ ਵਿੱਚ ਸੁਣੋ",
-        "voice_query_title": "🎙️ ਬੋਲ ਕੇ ਸਵਾਲ ਪੁੱછੋ (ਵੌਇਸ ਅਸਿਸਟੈਂਟ)",
+        "voice_query_title": "🎙️ ਬੋਲ ਕੇ ਸਵਾਲ ਪੁੱਛੋ (ਵੌਇਸ ਅਸਿਸਟੈਂਟ)",
         "voice_query_prompt": "ਮਾਈਕ ਬਟਨ ਦਬਾਓ ਅਤੇ ਆਪਣਾ ਸਵਾਲ ਬੋਲੋ:",
         "heatmap_title": "🌐 ਖੇਤਰੀ ਬਿਮਾਰੀ ਆਉਟਬ੍ਰੇਕ ਟ੍ਰੈਕਿੰਗ (ਹੀਟਮੈਪ)"
     },
@@ -322,8 +322,6 @@ UI_TEXT = {
         "download_pdf": "पीडीएफ (PDF) रिपोर्ट डाउनलोड करो",
         "confidence": "सटीकता दर",
         "audio_btn": "🔊 आवाज़ सुणो: उपचार सुनै",
-        "voice_query_title": "🎙️ बोल कर सवाल पूछें",
-        "voice_query_prompt": "अपना सवाल बोलें:",
         "heatmap_title": "🌐 क्षेत्रीय रोग हॉटस्पॉट"
     },
     "Urdu (اردو)": {
@@ -381,7 +379,7 @@ PLANT_DATABASE = {
             "category": "ਸਿਹਤਮੰਦ ਫਸਲ (ਕੋਈ ਬਿਮਾਰੀ ਨਹੀਂ)",
             "region": "ਸਹੀ ਨਿਕਾਸ ਅਤੇ ਸੰਤੁਲਿਤ ਸਿੰਚਾਈ ਵਾਲੀ ਮਿੱਟੀ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਪੱਤਿਆਂ ਵਿੱਚ ਹਰਿਆਵਲ (ਕਲੋਰੋਫਿਲ) ਪੂਰੀ ਤਰ੍ਹਾਂ ਕਾਇਮ ਹੈ। ਪੱਤਿਆਂ 'ਤੇ ਕਿਸੇ ਕਿਸਮ ਦੇ ਦਾਗ, ਧੱਬੇ ਜਾਂ ਸੁੱਕਣ ਦੇ ਲੱਛਣ ਨਹੀਂ ਹਨ।",
-            "action_plan": "1. ਸਿੰਚਾਈ: ਪੱਤਿਆਂ ਉੱਪਰ ਪਾਣੀ ਖੜ੍ਹਾ ਨਾ ਹੋਣ ਦਿਓ, ਤੁਪਕਾ ਸਿੰਚਾਈ ਪ੍ਰਣਾਲੀ ਵਰਤੋਂ।\n2. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਵਾਧੇ ਦੇ ਸਮੇਂ ਐਨ.ਪੀ.ਕੇ. (19:19:19) 2.5 ਗ੍ਰਾਮ ਪ੍ਰਤੀ ਲੀਟਰ ਪਾਣੀ ਵਿੱਚ ਛਿੜਕਾਓ ਕਰੋ।\n3. ਨਿਗਰਾਨੀ: ਕੀੜਿਆਂ ਦੀ ਰੋਕਥਾਮ ਲਈ ਹਰ ਹਫ਼ਤੇ ਖੇਤ ਦਾ ਨਿਰੀਖਣ ਕਰੋ।",
+            "action_plan": "1. ਸਿੰਚਾਈ: ਪੱਤਿਆਂ ਉੱਪਰ ਪਾਣੀ ਖੜ੍ਹਾ ਨਾ ਹੋਣ ਦਿਓ, ਤੁਪਕਾ ਸਿੰਚਾਈ ਪ੍ਰਣਾਲੀ ਵਰਤੋਂ።\n2. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਵਾਧੇ ਦੇ ਸਮੇਂ ਐਨ.ਪੀ.ਕੇ. (19:19:19) 2.5 ਗ੍ਰਾਮ ਪ੍ਰਤੀ ਲੀਟਰ ਪਾਣੀ ਵਿੱਚ ਛਿੜਕਾਓ ਕਰੋ।\n3. ਨਿਗਰਾਨੀ: ਕੀੜਿਆਂ ਦੀ ਰੋਕਥਾਮ ਲਈ ਹਰ ਹਫ਼ਤੇ ਖੇਤ ਦਾ ਨਿਰੀਖਣ ਕਰੋ।",
             "preventive": "ਮਿੱਟੀ ਦੀ ਸਮੇਂ ਸਿਰ ਜਾਂਚ ਕਰਵਾਓ। ਬਜਾਈ ਤੋਂ ਪਹਿਲਾਂ ਰੂੜੀ ਦੀ ਖਾਦ ਜਾਂ ਵਰਮੀਕੰਪੋਸਟ ਖੇਤ ਵਿੱਚ ਜ਼ਰੂਰ ਮਿਲਾਓ।"
         }
     },
@@ -433,7 +431,7 @@ PLANT_DATABASE = {
             "category": "ਮੁੱਖ ਖੁਰਾਕੀ ਤੱਤ ਦੀ ਘਾਟ (ਪੱਤਿਆਂ ਦਾ ਪੀਲਾਪਣ)",
             "region": "ਰੇਤਲੀਆਂ ਜ਼ਮੀਨਾਂ ਅਤੇ ਵੱਧ ਬਾਰਿਸ਼ ਵਾਲੇ ਖੇਤਰਾਂ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਹੇਠਲੇ ਪੁਰਾਣੇ ਪੱਤਿਆਂ ਤੋਂ ਪੀਲਾਪਣ ਸ਼ੁਰੂ ਹੋ ਕੇ ਉੱਪਰ ਵੱਲ ਵਧਦਾ ਹੈ। ਪੌਦੇ ਦਾ ਵਾਧਾ ਰੁਕ ਜਾਂਦਾ ਹੈ।",
-            "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਯੂਰੀਆ (25 ਕਿੱਲੋ/ਏਕੜ) ਦੀ ਵਰਤੋਂ ਕਰੋ।\n2. ਸਪਰੇਅ: 1% ਯੂਰੀਆ ਦੇ ਘੋਲ (10 ਗ੍ਰਾਮ/ਲੀਟਰ) ਦਾ ਪੱਤਿਆਂ 'ਤੇ ਛਿੜਕਾਅ ਕਰੋ।\n3. ਜੈਵਿਕ ਖਾਦ: ਰੂੜੀ ਜਾਂ ਵਰਮੀਕੰਪੋਸਟ ਮਿੱਟੀ ਵਿੱਚ ਮਿਲਾਓ।",
+            "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਯੂਰੀਆ (25 ਕਿੱਲੋ/ਏਕੜ) ਦੀ ਵਰਤੋਂ ਕਰੋ።\n2. ਸਪਰੇਅ: 1% ਯੂਰੀਆ ਦੇ ਘੋਲ (10 ਗ੍ਰਾਮ/ਲੀਟਰ) ਦਾ ਪੱਤਿਆਂ 'ਤੇ ਛਿੜਕਾਅ ਕਰੋ।\n3. ਜੈਵਿਕ ਖਾਦ: ਰੂੜੀ ਜਾਂ ਵਰਮੀਕੰਪੋਸਟ ਮਿੱਟੀ ਵਿੱਚ ਮਿਲਾਓ।",
             "preventive": "ਫਲੀਦਾਰ ਫਸਲਾਂ (ਜਿਵੇਂ ਮੂੰਗੀ, ਰਵਾਂਹ) ਦੀ ਬਜਾਈ ਕਰੋ ਤਾਂ ਜੋ ਮਿੱਟੀ ਦੀ ਉਪਜਾਊ ਸ਼ਕਤੀ ਬਣੀ ਰਹੇ।"
         }
     },
@@ -459,7 +457,7 @@ PLANT_DATABASE = {
             "category": "ਜੜ੍ਹਾਂ ਦੇ ਵਾਧੇ ਵਿੱਚ ਰੁਕਾਵਟ",
             "region": "ਠੰਡੀ ਜਾਂ ਜ਼ਿਆਦਾ ਐਸਿਡਿਕ/ਖਾਰੀ ਮਿੱਟੀ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਪੱਤੇ ਗੂੜ੍ਹੇ ਹਰੇ ਹੋ ਕੇ ਕਿਨਾਰਿਆਂ ਤੋਂ ਜਾਮਣੀ ਜਾਂ ਲਾਲ ਰੰਗ के हो ਜਾਂਦੇ ਹਨ। ਜੜ੍ਹਾਂ ਦਾ ਵਾਧਾ ਰੁਕ ਜਾਂਦਾ ਹੈ।",
-            "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਡੀ.ਏ.ਪੀ (DAP) ਜਾਂ ਐਸ.ਐਸ.ਪੀ (SSP) ਖਾਦ ਜੜ੍ਹਾਂ ਦੇ ਨੇੜੇ ਪਾਓ।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ ਦਾ ਪੀ.ਐਚ (pH) ਸੰਤੁਲਿਤ ਕਰੋ।\n3. ਜੜ੍ਹਾਂ ਦਾ ਵਾਧਾ: ਹਿਊਮਿਕ ਐਸਿਡ (2 ਗ੍ਰਾਮ/ਲੀਟਰ) ਦੀ ਵਰਤੋਂ ਕਰੋ।",
+            "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਡੀ.ਏ.ਪੀ (DAP) ਜਾਂ ਐਸ.ਐਸ.ਪੀ (SSP) ਖਾਦ ਜੜ੍ਹਾਂ ਦੇ ਨੇੜੇ ਪਾਓ።\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ ਦਾ ਪੀ.ਐਚ (pH) ਸੰਤੁਲਿਤ ਕਰੋ।\n3. ਜੜ੍ਹਾਂ ਦਾ ਵਾਧਾ: ਹਿਊਮਿਕ ਐਸਿਡ (2 ਗ੍ਰਾਮ/ਲੀਟਰ) ਦੀ ਵਰਤੋਂ ਕਰੋ।",
             "preventive": "ਬਜਾਈ ਤੋਂ ਪਹਿਲਾਂ ਬੀਜਾਂ ਨੂੰ ਪੀ.ਐਸ.ਬੀ (PSB) ਸੱਭਿਆਚਾਰ ਨਾਲ ਸੋਧੋ।"
         }
     },
@@ -511,7 +509,7 @@ PLANT_DATABASE = {
             "category": "ਸੂਖਮ ਖੁਰਾਕੀ ਤੱਤ की ਘਾਟ",
             "region": "ਖਾਰੀ ਮਿੱਟੀ (pH > 7.5) ਅਤੇ ਪਾਣੀ ਖੜ੍ਹਨ ਵਾਲੀਆਂ ਜ਼ਮੀਨਾਂ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਨਵੀਆਂ ਉੱਪਰਲੀਆਂ ਪੱਤਿਆਂ कीਆਂ ਨਾੜੀਆਂ ਹਰੀਆਂ ਰਹਿੰਦੀਆਂ ਹਨ ਜਦੋਂ ਕਿ ਬਾਕੀ ਪੱਤਾ ਪੀਲਾ/ਚਿੱਟਾ ਪੈ ਜਾਂਦਾ है।",
-            "action_plan": "1. ਸਪਰੇਅ: ਚਿਲੇਟਡ ਆਇਰನ್ (Fe-EDDHA) 2 ਗ੍ਰਾਮ/लीटर da ਛਿੜਕਾਅ करो।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ da ਖਾਰਾਪਣ ਘਟਾਉਣ ਲਈ ਸਲਫर दी ਵਰਤੋਂ करो।\n3. हवा दा संचार: खेत विचों वधु पाणी निकासी दा प्रबंध करो।",
+            "action_plan": "1. ਸਪਰੇਅ: ਚਿਲੇਟਡ ਆਇਰన్ (Fe-EDDHA) 2 ਗ੍ਰਾਮ/लीटर da ਛਿੜਕਾਅ करो।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ da ਖਾਰਾਪਣ ਘਟਾਉਣ ਲਈ ਸਲਫर दी ਵਰਤੋਂ करो।\n3. हवा दा संचार: खेत विचों वधु पाणी निकासी दा प्रबंध करो।",
             "preventive": "ਮਿੱਟੀ da pH ਸੰਤੁਲਿਤ ਰੱਖਣ ਲਈ ਜੈਵਿਕ ਖਾਦਾਂ ਵਰतों।"
         }
     }
@@ -776,16 +774,26 @@ elif st.session_state.page == "results":
     st.markdown(f"# 📊 {txt['report_header']}")
     st.write("---")
 
+    # Top Status Metric Cards Row (Fills empty space with rich agronomic metrics)
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        st.metric(label="🎯 Diagnostic Certainty", value=f"{confidence:.1f}%")
+    with m2:
+        st.metric(label="🌱 Soil Profile", value=res["soil"].split("(")[0].strip())
+    with m3:
+        st.metric(label="💰 Treatment Budget", value=res["budget"].split("(")[0].strip()[:15])
+
+    st.write("---")
+
     # Slide Container 2: Elaborate, Scrollable Results Dashboard
     with st.container(border=True):
         col1, col2 = st.columns([1, 2])
         with col1:
             st.image(res["image"], use_container_width=True)
-            st.metric(label=txt["confidence"], value=f"{confidence:.2f}%")
         with col2:
-            st.markdown(f"### {info['title']}")
-            st.markdown(f"**{txt['category']}:** {info['category']}")
-            st.markdown(f"**Field Profile:** Soil: `{res['soil']}` | Irrigation: `{res['irrigation']}`")
+            st.markdown(f"### 🏷️ {info['title']}")
+            st.markdown(f"**Category:** `{info['category']}`")
+            st.markdown(f"**Irrigation Status:** `{res['irrigation']}`")
             
             # Voice-Guided Audio Playback Module
             audio_bytes = generate_audio_advisory(info["title"], info["action_plan"], lang)
@@ -800,7 +808,6 @@ elif st.session_state.page == "results":
         farmer_audio = st.audio_input("Record Voice Question", label_visibility="collapsed")
         if farmer_audio is not None:
             st.success("🎤 **Voice Question Received!** Processing query against localized agronomic knowledge base...")
-            # Interactive response simulation answering back via gTTS
             response_speech = f"Based on your question regarding {info['title']}, please follow the recommended treatment plan shown below."
             resp_audio_bytes = generate_audio_advisory("LeafSpec AI Assistant", response_speech, lang)
             st.audio(resp_audio_bytes, format="audio/mp3")
