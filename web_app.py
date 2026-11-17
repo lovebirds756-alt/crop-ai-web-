@@ -204,7 +204,7 @@ UI_TEXT = {
         "download_pdf": "ਪੂਰੀ ਪੀ.ਡੀ.ਐਫ (PDF) ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ",
         "confidence": "ਜਾਂਚ ਨਿਰਧਾਰਨ ਦਰ",
         "audio_btn": "🔊 ਆਵਾਜ਼ ਸੁਣੋ: ਇਲਾਜ ਦੀ ਜਾਣਕਾਰੀ ਆਵਾਜ਼ ਵਿੱਚ ਸੁਣੋ",
-        "heatmap_title": "🌐 ਖੇਤਰੀ ਬਿਮਾਰੀ ਆਉਟਬ੍ਰੇਕ ਟ੍ਰੈਕਿੰਗ (ਹੀਟਮੈప్)"
+        "heatmap_title": "🌐 ਖੇਤਰੀ ਬਿਮਾਰੀ ਆਉਟਬ੍ਰੇਕ ਟ੍ਰੈਕਿੰਗ (ਹੀਟਮੈਪ)"
     },
     "Haryanvi (हरियाणवी)": {
         "title": "लीफस्पेक एआई (LEAFSPEC AI)",
@@ -466,7 +466,7 @@ PLANT_DATABASE = {
             "title": "ਪੋਟਾਸ਼ੀਅਮ (K) ਖੁਰਾਕੀ ਤੱਤ ਦੀ ਘਾਟ",
             "category": "ਪੱਤਿਆਂ के ਕਿਨਾਰਿਆਂ ਦਾ ਸੜਨਾ",
             "region": "ਰੇਤਲੀਆਂ ਜ਼ਮੀਨਾਂ ਅਤੇ ਵੱਧ ਯੂਰੀਆ ਵਰਤਣ ਵਾਲੇ ਖੇਤਾਂ ਵਿੱਚ ਆਮ।",
-            "symptoms": "ਪੱਤਿਆਂ के ਕਿਨਾਰੇ ਭੂਰੇ ਹੋ ਕੇ ਸੜੇ ਹੋਏ (Scorched) ਦਿਸਦੇ ਹਨ। ਤਣਾ ਕਮਜ਼ੋਰ ਹੋ ਜਾਂਦਾ ਹੈ।",
+            "symptoms": "ਪੱਤਿਆਂ के ਕਿਨਾਰੇ ਭੂਰੇ ਹੋ ਕੇ ਸੜੇ ਹੋਏ (Scorched) ਦਿਸਦੇ ਹਨ। ਤਣਾ ਕਮਜ਼ੋਰ ਹੋ ਜਾਂਦਾ है।",
             "action_plan": "1. ਖਾਦ ਪ੍ਰਬੰਧਨ: ਪੋਟਾਸ਼ (MOP - 20 ਕਿੱਲੋ/ਏਕੜ) ਪਾਓ।\n2. ਸਪਰੇਅ: ਪੋਟਾਸ਼ੀਅਮ ਨਾਈਟ੍ਰੇਟ (13:0:45) 15 ਗ੍ਰਾਮ/ਲੀਟਰ ਦਾ ਛਿੜਕਾਅ ਕਰੋ।\n3. ਨਮੀ: ਖੇਤ ਵਿੱਚ ਸਹੀ ਨਮੀ ਬਣਾ ਕੇ ਰੱਖੋ।",
             "preventive": "ਬਜਾਈ ਸਮੇਂ ਪੋਟਾਸ਼ ਖਾਦ ਦੀ ਬੁਨਿਆਦੀ ਖੁਰਾਕ ਜ਼ਰੂਰ ਦਿਓ।"
         }
@@ -493,7 +493,7 @@ PLANT_DATABASE = {
             "category": "ਸੂਖਮ ਖੁਰਾਕੀ ਤੱਤ की ਘਾਟ",
             "region": "ਖਾਰੀ ਮਿੱਟੀ (pH > 7.5) ਅਤੇ ਪਾਣੀ ਖੜ੍ਹਨ ਵਾਲੀਆਂ ਜ਼ਮੀਨਾਂ ਵਿੱਚ ਆਮ।",
             "symptoms": "ਨਵੀਆਂ ਉੱਪਰਲੀਆਂ ਪੱਤਿਆਂ कीਆਂ ਨਾੜੀਆਂ ਹਰੀਆਂ ਰਹਿੰਦੀਆਂ ਹਨ ਜਦੋਂ ਕਿ ਬਾਕੀ ਪੱਤਾ ਪੀਲਾ/ਚਿੱਟਾ ਪੈ ਜਾਂਦਾ है।",
-            "action_plan": "1. ਸਪਰੇਅ: ਚਿਲੇਟਡ ਆਇਰన్ (Fe-EDDHA) 2 ਗ੍ਰਾਮ/ਲੀਟਰ da ਛਿੜਕਾਅ करो।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ da ਖਾਰਾਪਣ ਘਟਾਉਣ ਲਈ ਸਲਫर दी ਵਰਤੋਂ करो।\n3. हवा दा संचार: खेत विचों वधु पाणी निकासी दा प्रबंध करो।",
+            "action_plan": "1. ਸਪਰੇਅ: ਚਿਲੇਟਡ ਆਇਰన్ (Fe-EDDHA) 2 ਗ੍ਰਾਮ/लीटर da ਛਿੜਕਾਅ करो।\n2. ਮਿੱਟੀ ਸੁਧਾਰ: ਮਿੱਟੀ da ਖਾਰਾਪਣ ਘਟਾਉਣ ਲਈ ਸਲਫर दी ਵਰਤੋਂ करो।\n3. हवा दा संचार: खेत विचों वधु पाणी निकासी दा प्रबंध करो।",
             "preventive": "ਮਿੱਟੀ da pH ਸੰਤੁਲਿਤ ਰੱਖਣ ਲਈ ਜੈਵਿਕ ਖਾਦਾਂ ਵਰਤੋਂ।"
         }
     }
@@ -721,7 +721,6 @@ if st.session_state.page == "upload":
                 st.write("---")
                 if st.button(txt["analyze_btn"], use_container_width=True):
                     # Execute Inference / Mock Simulation mapped to database
-                    # For exhibition robust reliability, map classification results
                     analysis_keys = list(PLANT_DATABASE.keys())
                     chosen_key = np.random.choice(analysis_keys, p=[0.15, 0.35, 0.15, 0.12, 0.15, 0.08])
                     confidence_score = float(np.random.uniform(91.4, 98.9))
@@ -737,3 +736,74 @@ if st.session_state.page == "upload":
                         "info": disease_info,
                         "confidence": confidence_score,
                         "image": image,
+                        "soil": soil_type,
+                        "budget": budget_pref,
+                        "irrigation": irrigation_cond
+                    }
+                    st.session_state.page = "results"
+                    st.rerun()
+
+elif st.session_state.page == "results":
+    res = st.session_state.analysis_result
+    lang = st.session_state.selected_lang
+    txt = UI_TEXT.get(lang, UI_TEXT["English"])
+    info = res["info"]
+    confidence = res["confidence"]
+
+    # Top Navigation Slide Switcher
+    if st.button(txt["back_btn"]):
+        st.session_state.page = "upload"
+        st.rerun()
+
+    st.markdown(f"# 📊 {txt['report_header']}")
+    st.write("---")
+
+    # Slide Container 2: Elaborate, Scrollable Results Dashboard
+    with st.container(border=True):
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            st.image(res["image"], use_container_width=True)
+            st.metric(label=txt["confidence"], value=f"{confidence:.2f}%")
+        with col2:
+            st.markdown(f"### {info['title']}")
+            st.markdown(f"**{txt['category']}:** {info['category']}")
+            st.markdown(f"**Field Profile:** Soil: `{res['soil']}` | Irrigation: `{res['irrigation']}`")
+            
+            # Siri-Style Voice Assistant / Audio Playback Module
+            audio_bytes = generate_audio_advisory(info["title"], info["action_plan"], lang)
+            st.audio(audio_bytes, format="audio/mp3")
+            st.info(txt["audio_btn"])
+
+    # Scrollable / Expandable Detailed Agronomic Breakdown Sections
+    with st.container(border=True):
+        st.markdown(f"### 🧬 {txt['region'].upper()}")
+        st.write(info["region"])
+
+    with st.container(border=True):
+        st.markdown(f"### 🔍 {txt['symptoms'].upper()}")
+        st.write(info["symptoms"])
+
+    with st.container(border=True):
+        st.markdown(f"### 🛡️ {txt['action_plan'].upper()}")
+        st.info(info["action_plan"])
+
+    with st.container(border=True):
+        st.markdown(f"### 🌱 {txt['preventive'].upper()}")
+        st.success(info["preventive"])
+
+    # PDF Export Module
+    st.write("---")
+    pdf_data = generate_pdf_report(res, lang)
+    st.download_button(
+        label=f"📥 {txt['download_pdf']}",
+        data=pdf_data,
+        file_name="LeafSpec_AI_Agronomic_Report.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
+
+    # Localized Community Heatmap Log
+    st.write("---")
+    st.markdown(f"### {txt['heatmap_title']}")
+    log_data = load_disease_log()
+    st.dataframe(log_data, use_container_width=True)
